@@ -1,8 +1,6 @@
 # WikiNote
 
-> 本项目基于 [IsaacGemal/wikitok](https://github.com/IsaacGemal/wikitok) 开发，感谢原作者的开源贡献。我们在保留原有功能的基础上，将界面优化为更适合Web端浏览的瀑布流布局。
-
-A Pinterest-style waterfall interface for exploring random Wikipedia articles in multiple languages, inspired by Xiaohongshu (RED).
+A RedNote-style waterfall interface for exploring random Wikipedia articles in multiple languages. This project is based on [IsaacGemal/wikitok](https://github.com/IsaacGemal/wikitok), and we have enhanced it with a masonry layout that's more suitable for web browsing.
 
 ## Features
 
@@ -56,4 +54,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=IsaacGemal/wikitok&type=Date)
+![Star History Chart](https://api.star-history.com/svg?repos=Exploreryer/wikinote&type=Date)
