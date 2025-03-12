@@ -1,10 +1,12 @@
-# WikiTok
+# WikiNote
 
-A TikTok-style interface for exploring random Wikipedia articles in multiple languages.
+> 本项目基于 [IsaacGemal/wikitok](https://github.com/IsaacGemal/wikitok) 开发，感谢原作者的开源贡献。我们在保留原有功能的基础上，将界面优化为更适合Web端浏览的瀑布流布局。
+
+A Pinterest-style waterfall interface for exploring random Wikipedia articles in multiple languages, inspired by Xiaohongshu (RED).
 
 ## Features
 
-- Vertical scrolling feed of random Wikipedia articles
+- Waterfall/Masonry layout for better web browsing experience
 - Support for 14 languages including English, Spanish, French, German, Chinese, Japanese and more
 - Article previews with images, titles and excerpts
 - Share articles directly or copy links
@@ -40,9 +42,7 @@ No backend required!
 
 ## Demo
 
-Check it out here at [wikitok.vercel.app](https://wikitok.vercel.app) or [wikitok.io](https://www.wikitok.io)
-
-**Note:** This is the original WikiTok web project, not affiliated with wikitok.net or the independently developed WikiTok mobile apps for iPhone and Android.
+Coming soon...
 
 ## Contributing
 
