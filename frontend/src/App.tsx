@@ -241,12 +241,14 @@ function App() {
         </div>
       )}
 
-      {articles.map((article) => (
-        <WikiCard key={article.pageid} article={article} />
-      ))}
-      <div ref={observerTarget} className="h-10 -mt-1" />
+      <div className="masonry-grid pt-16">
+        {articles.map((article) => (
+          <WikiCard key={article.pageid} article={article} />
+        ))}
+        <div ref={observerTarget} className="h-10 col-span-full" />
+      </div>
       {loading && (
-        <div className="h-screen w-full flex items-center justify-center gap-2">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 bg-black/80 text-white px-4 py-2 rounded-full">
           <Loader2 className="h-6 w-6 animate-spin" />
           <span>Loading...</span>
         </div>

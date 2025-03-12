@@ -20,12 +20,12 @@ const ArticleList: FC<ArticleListProps> = ({ articles, onArticleSelect }) => {
 
   return (
     <nav aria-label="Articles navigation">
-      <ul 
+      <div 
         role="list"
-        className="articles-list"
+        className="masonry-grid"
       >
         {articles.map((article, index) => (
-          <li 
+          <div
             key={index}
             role="listitem"
             tabIndex={0}
@@ -34,9 +34,9 @@ const ArticleList: FC<ArticleListProps> = ({ articles, onArticleSelect }) => {
             aria-label={`Article: ${article.title}`}
           >
             <Article {...article} />
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </nav>
   );
 };

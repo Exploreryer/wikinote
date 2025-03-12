@@ -1,6 +1,7 @@
 import { Share2, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useLikedArticles } from '../contexts/LikedArticlesContext';
+import '../styles/WikiCard.css';
 
 export interface WikiArticle {
     title: string;
@@ -23,13 +24,6 @@ export function WikiCard({ article }: WikiCardProps) {
     const [imageLoaded, setImageLoaded] = useState(false);
     const { toggleLike, isLiked } = useLikedArticles();
 
-    // Add debugging log
-    console.log('Article data:', {
-        title: article.title,
-        displaytitle: article.displaytitle,
-        pageid: article.pageid
-    });
-
     const handleShare = async () => {
         if (navigator.share) {
             try {
@@ -49,73 +43,51 @@ export function WikiCard({ article }: WikiCardProps) {
     };
 
     return (
-        <div className="h-screen w-full flex items-center justify-center snap-start relative" onDoubleClick={() => toggleLike(article)}>
-            <div className="h-full w-full relative">
+        <div className="wiki-card hover:shadow-lg transition-shadow duration-300">
+            <div className="wiki-card-image">
                 {article.thumbnail ? (
-                    <div className="absolute inset-0">
-                        <img
-                            loading="lazy"
-                            src={article.thumbnail.source}
-                            alt={article.displaytitle}
-                            className={`w-full h-full object-cover transition-opacity duration-300 bg-white ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                                }`}
-                            onLoad={() => setImageLoaded(true)}
-                            onError={(e) => {
-                                console.error('Image failed to load:', e);
-                                setImageLoaded(true); // Show content even if image fails
-                            }}
-                        />
-                        {!imageLoaded && (
-                            <div className="absolute inset-0 bg-gray-900 animate-pulse" />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/60" />
-                    </div>
+                    <img
+                        loading="lazy"
+                        src={article.thumbnail.source}
+                        alt={article.displaytitle}
+                        className={`${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+                        onLoad={() => setImageLoaded(true)}
+                        onError={(e) => {
+                            console.error('Image failed to load:', e);
+                            setImageLoaded(true);
+                        }}
+                    />
                 ) : (
-                    <div className="absolute inset-0 bg-gray-900" />
+                    <div className="bg-gray-200 h-full w-full" />
                 )}
-                {/* Content container with z-index to ensure it's above the image */}
-                <div className="absolute backdrop-blur-xs bg-black/30 bottom-[10vh] left-0 right-0 p-6 text-white z-10">
-                    <div className="flex justify-between items-start mb-3">
-                        <a
-                            href={article.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-gray-200 transition-colors"
-                        >
-                            <h2 className="text-2xl font-bold drop-shadow-lg">{article.displaytitle}</h2>
-                        </a>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => toggleLike(article)}
-                                className={`p-2 rounded-full backdrop-blur-sm transition-colors ${isLiked(article.pageid)
-                                    ? 'bg-red-500 hover:bg-red-600'
-                                    : 'bg-white/10 hover:bg-white/20'
-                                    }`}
-                                aria-label="Like article"
-                            >
-                                <Heart
-                                    className={`w-5 h-5 ${isLiked(article.pageid) ? 'fill-white' : ''}`}
-                                />
-                            </button>
-                            <button
-                                onClick={handleShare}
-                                className="p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
-                                aria-label="Share article"
-                            >
-                                <Share2 className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
-                    <p className="text-gray-100 mb-4 drop-shadow-lg line-clamp-6">{article.extract}</p>
+                <div className="absolute top-4 right-4 flex gap-2">
+                    <button
+                        onClick={() => toggleLike(article)}
+                        className={`p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${isLiked(article.pageid) ? 'bg-red-500/80 hover:bg-red-500/90 scale-110' : 'bg-white/10 hover:bg-white/20'}`}
+                        aria-label="Like article"
+                    >
+                        <Heart className="w-5 h-5" fill={isLiked(article.pageid) ? 'currentColor' : 'none'} />
+                    </button>
+                    <button
+                        onClick={handleShare}
+                        className="p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-110"
+                        aria-label="Share article"
+                    >
+                        <Share2 className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+            <div className="wiki-card-content">
+                <h3 className="wiki-card-title hover:text-blue-500 transition-colors duration-300">
                     <a
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block text-white hover:text-gray-200 drop-shadow-lg"
                     >
-                        Read more →
+                        {article.displaytitle}
                     </a>
-                </div>
+                </h3>
+                <p className="wiki-card-excerpt">{article.extract}</p>
             </div>
         </div>
     );
