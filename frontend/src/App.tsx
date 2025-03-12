@@ -75,7 +75,7 @@ function App() {
           onClick={() => window.location.reload()}
           className="text-2xl font-bold text-white drop-shadow-lg hover:opacity-80 transition-opacity"
         >
-          WikiTok
+          WikiNote
         </button>
       </div>
 
@@ -104,43 +104,34 @@ function App() {
             >
               ✕
             </button>
-            <h2 className="text-xl font-bold mb-4">About WikiTok</h2>
+            <h2 className="text-xl font-bold mb-4">About WikiNote</h2>
             <p className="mb-4">
-              A TikTok-style interface for exploring random Wikipedia articles.
+              A RedNote-inspired interface for exploring random Wikipedia articles. This project builds upon IsaacGemal's wikitok, enhancing it for a more immersive web browsing experience.
             </p>
             <p className="text-white/70">
               Made with ❤️ by{" "}
               <a
-                href="https://x.com/Aizkmusic"
+                href="https://github.com/Exploreryer"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:underline"
               >
-                @Aizkmusic
+                Exploreryer
               </a>
+            </p>
+            <p className="text-white/70 mt-2">
+              Special thanks to IsaacGemal for the original inspiration and foundational work.
             </p>
             <p className="text-white/70 mt-2">
               Check out the code on{" "}
               <a
-                href="https://github.com/IsaacGemal/wikitok"
+                href="https://github.com/Exploreryer/wikinote"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:underline"
               >
                 GitHub
               </a>
-            </p>
-            <p className="text-white/70 mt-2">
-              If you enjoy this project, you can{" "}
-              <a
-                href="https://buymeacoffee.com/aizk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:underline"
-              >
-                buy me a coffee
-              </a>
-              ! ☕
             </p>
           </div>
           <div
