@@ -1,6 +1,6 @@
 {
-	"short_name": "WikiTok",
-	"name": "WikiTok",
+	"short_name": "WikiNote",
+	"name": "WikiNote",
 	"icons": [
 		{
 			"src": "/web-app-manifest-192x192.png",
