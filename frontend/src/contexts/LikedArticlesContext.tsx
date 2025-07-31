@@ -1,13 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import type { WikiArticle } from "../components/WikiCard";
+import type { WikiArticle, LikedArticlesContextType } from "../types/ArticleProps";
 import { Heart } from "lucide-react";
 import '../assets/heartAnimation.css';
-
-interface LikedArticlesContextType {
-    likedArticles: WikiArticle[];
-    toggleLike: (article: WikiArticle) => void;
-    isLiked: (pageid: number) => boolean;
-}
 
 const LikedArticlesContext = createContext<LikedArticlesContextType | undefined>(undefined);
 

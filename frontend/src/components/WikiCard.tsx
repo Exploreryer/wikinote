@@ -1,30 +1,19 @@
 import { Share2, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useLikedArticles } from '../contexts/LikedArticlesContext';
+import { useI18n } from '../hooks/useI18n';
+import type { ArticleProps } from '../types/ArticleProps';
 import '../styles/WikiCard.css';
 
-export interface WikiArticle {
-    title: string;
-    displaytitle: string;
-    extract: string;
-    pageid: number;
-    url: string;
-    thumbnail: {
-        source: string;
-        width: number;
-        height: number;
-    };
-}
-
-interface WikiCardProps {
-    article: WikiArticle;
-}
-
-export function WikiCard({ article }: WikiCardProps) {
+export function WikiCard({ article }: ArticleProps) {
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [shareError, setShareError] = useState(false);
     const { toggleLike, isLiked } = useLikedArticles();
+    const { t } = useI18n();
 
     const handleShare = async () => {
+        setShareError(false);
+        
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -33,12 +22,28 @@ export function WikiCard({ article }: WikiCardProps) {
                     url: article.url
                 });
             } catch (error) {
-                console.error('Error sharing:', error);
+                if ((error as Error).name !== 'AbortError') {
+                    console.error('Error sharing:', error);
+                    setShareError(true);
+                }
             }
         } else {
             // Fallback: Copy to clipboard
-            await navigator.clipboard.writeText(article.url);
-            alert('Link copied to clipboard!');
+            try {
+                await navigator.clipboard.writeText(article.url);
+                // 使用更好的提示方式
+                const notification = document.createElement('div');
+                notification.textContent = t('common.copied');
+                notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 2000);
+            } catch (error) {
+                console.error('Error copying to clipboard:', error);
+                setShareError(true);
+            }
         }
     };
 
@@ -63,15 +68,20 @@ export function WikiCard({ article }: WikiCardProps) {
                 <div className="absolute top-4 right-4 flex gap-2">
                     <button
                         onClick={() => toggleLike(article)}
-                        className={`p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${isLiked(article.pageid) ? 'bg-red-500/80 hover:bg-red-500/90 scale-110' : 'bg-white/10 hover:bg-white/20'}`}
-                        aria-label="Like article"
+                        className={`p-2.5 rounded-full adaptive-button ${isLiked(article.pageid) 
+                            ? 'text-red-500' 
+                            : 'hover:text-red-500'
+                        }`}
+                        aria-label={t('common.like')}
+                        title={t('common.like')}
                     >
                         <Heart className="w-5 h-5" fill={isLiked(article.pageid) ? 'currentColor' : 'none'} />
                     </button>
                     <button
                         onClick={handleShare}
-                        className="p-2 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 hover:scale-110"
-                        aria-label="Share article"
+                        className={`p-2.5 rounded-full adaptive-button hover:text-blue-500 ${shareError ? 'text-red-500' : ''}`}
+                        aria-label={t('common.share')}
+                        title={t('common.share')}
                     >
                         <Share2 className="w-5 h-5" />
                     </button>

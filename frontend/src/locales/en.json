@@ -1,0 +1,42 @@
+{
+  "app": {
+    "title": "WikiNote",
+    "about": "About",
+    "likes": "Likes",
+    "language": "Language"
+  },
+  "about": {
+    "title": "About WikiNote",
+    "description": "A RedNote-inspired interface for exploring random Wikipedia articles. This project builds upon IsaacGemal's wikitok, enhancing it for a more immersive web browsing experience.",
+    "madeWith": "Made with ❤️ by",
+    "specialThanks": "Special thanks to IsaacGemal for the original inspiration and foundational work.",
+    "checkCode": "Check out the code on"
+  },
+  "likes": {
+    "title": "Liked Articles",
+    "export": "Export",
+    "search": "Search liked articles...",
+    "noMatches": "No matches found.",
+    "noLikedArticles": "No liked articles yet.",
+    "remove": "Remove from likes",
+    "articles": "articles",
+    "tryDifferentSearch": "Try a different search term",
+    "startLiking": "Start liking articles you enjoy"
+  },
+  "common": {
+    "loading": "Loading...",
+    "loadingMore": "Loading more...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "share": "Share",
+    "like": "Like",
+    "copied": "Link copied to clipboard!"
+  },
+  "errors": {
+    "fetchFailed": "Failed to load articles",
+    "networkError": "Network connection error",
+    "tryAgain": "Please try again later",
+    "somethingWrong": "Something went wrong"
+  }
+}

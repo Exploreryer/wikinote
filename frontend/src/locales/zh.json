@@ -1,0 +1,42 @@
+{
+  "app": {
+    "title": "WikiNote",
+    "about": "关于",
+    "likes": "收藏",
+    "language": "语言"
+  },
+  "about": {
+    "title": "关于 WikiNote",
+    "description": "一个受小红书启发的维基百科随机文章浏览界面。这个项目基于 IsaacGemal 的 wikitok，为更沉浸式的网页浏览体验进行了增强。",
+    "madeWith": "用 ❤️ 制作，作者：",
+    "specialThanks": "特别感谢 IsaacGemal 提供的原始灵感和基础工作。",
+    "checkCode": "在此查看代码："
+  },
+  "likes": {
+    "title": "收藏文章",
+    "export": "导出",
+    "search": "搜索收藏文章...",
+    "noMatches": "未找到匹配项。",
+    "noLikedArticles": "还没有收藏的文章。",
+    "remove": "从收藏中移除",
+    "articles": "篇文章",
+    "tryDifferentSearch": "尝试使用不同的搜索词",
+    "startLiking": "开始收藏你喜欢的文章吧"
+  },
+  "common": {
+    "loading": "加载中...",
+    "loadingMore": "加载更多...",
+    "error": "错误",
+    "retry": "重试",
+    "close": "关闭",
+    "share": "分享",
+    "like": "收藏",
+    "copied": "链接已复制到剪贴板！"
+  },
+  "errors": {
+    "fetchFailed": "加载文章失败",
+    "networkError": "网络连接错误",
+    "tryAgain": "请稍后重试",
+    "somethingWrong": "出现了问题"
+  }
+}
