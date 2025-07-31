@@ -92,7 +92,7 @@ export function LanguageSelector() {
       {/* 语言下拉菜单 */}
       {showDropdown && (
         <div 
-          className="absolute bg-white rounded-xl shadow-xl border border-gray-200"
+          className="absolute bg-white/95 backdrop-blur-2xl rounded-xl shadow-xl border border-white/40"
           style={{ 
             top: '100%',
             right: '0',
@@ -100,12 +100,16 @@ export function LanguageSelector() {
             maxHeight: '400px',
             zIndex: 10001,
             marginTop: '8px',
-            position: 'absolute'
+            position: 'absolute',
+            backdropFilter: 'blur(32px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(32px) saturate(180%)',
+            transform: 'translateZ(0)',
+            willChange: 'transform'
           }}
           data-testid="language-dropdown"
         >
-          <div className="p-3 border-b border-gray-200">
-            <div className="text-sm font-medium text-gray-700">Select Wikipedia Language</div>
+          <div className="p-3 border-b border-white/20">
+            <div className="text-sm font-medium text-gray-800">Select Wikipedia Language</div>
           </div>
           
           <div 
@@ -120,10 +124,10 @@ export function LanguageSelector() {
                   setLanguage(language.id);
                   setShowDropdown(false);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-blue-50 rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/20 rounded-lg transition-all duration-200 text-left"
                 title={`Switch to ${language.name}`}
               >
-                <div className="w-5 h-5 rounded-full flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full flex-shrink-0 bg-white/30 backdrop-blur-sm flex items-center justify-center">
                   <img 
                     className="w-5 h-5 rounded-full object-cover"
                     src={cachedImages[language.id] || language.flag} 
@@ -131,7 +135,7 @@ export function LanguageSelector() {
                     style={{ 
                       minWidth: '20px',
                       minHeight: '20px',
-                      backgroundColor: '#f3f4f6'
+                      backgroundColor: 'transparent'
                     }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -139,13 +143,13 @@ export function LanguageSelector() {
                       target.nextElementSibling?.classList.remove('hidden');
                     }}
                   />
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 hidden flex items-center justify-center">
-                    <span className="text-xs text-gray-600 font-bold">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 hidden flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">
                       {language.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </div>
-                <span className="text-sm text-gray-700 truncate">{language.name}</span>
+                <span className="text-sm text-gray-800 truncate">{language.name}</span>
               </button>
             ))}
           </div>

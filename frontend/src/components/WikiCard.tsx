@@ -31,7 +31,7 @@ export function WikiCard({ article }: ArticleProps) {
             // Fallback: Copy to clipboard
             try {
                 await navigator.clipboard.writeText(article.url);
-                // 使用更好的提示方式
+                // Use better notification method
                 const notification = document.createElement('div');
                 notification.textContent = t('common.copied');
                 notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
@@ -68,9 +68,9 @@ export function WikiCard({ article }: ArticleProps) {
                 <div className="absolute top-4 right-4 flex gap-2">
                     <button
                         onClick={() => toggleLike(article)}
-                        className={`p-2.5 rounded-full adaptive-button ${isLiked(article.pageid) 
-                            ? 'text-red-500' 
-                            : 'hover:text-red-500'
+                        className={`p-2.5 rounded-full glass-button ${isLiked(article.pageid) 
+                            ? 'text-red-500 liked' 
+                            : 'text-white hover:text-red-500'
                         }`}
                         aria-label={t('common.like')}
                         title={t('common.like')}
@@ -79,7 +79,7 @@ export function WikiCard({ article }: ArticleProps) {
                     </button>
                     <button
                         onClick={handleShare}
-                        className={`p-2.5 rounded-full adaptive-button hover:text-blue-500 ${shareError ? 'text-red-500' : ''}`}
+                        className={`p-2.5 rounded-full glass-button text-white hover:text-blue-500 ${shareError ? 'text-red-500' : ''}`}
                         aria-label={t('common.share')}
                         title={t('common.share')}
                     >

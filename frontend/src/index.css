@@ -143,6 +143,70 @@ html, body {
   }
 }
 
+/* 高级毛玻璃按钮 - 参考iOS风格 */
+.glass-button {
+  background: 
+    linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
+    rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  color: white;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 50%, 
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glass-button:hover {
+  background: 
+    linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.4)),
+    rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(25px) saturate(200%);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.glass-button:hover::before {
+  opacity: 1;
+}
+
+.glass-button.liked {
+  background: 
+    linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.3)),
+    rgba(255, 255, 255, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.glass-button.liked:hover {
+  background: 
+    linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(239, 68, 68, 0.4)),
+    rgba(255, 255, 255, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
 /* 自适应对比度按钮 - 确保在任何背景下都可见 */
 .adaptive-button {
   /* 双重背景技术 */

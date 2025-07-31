@@ -23,13 +23,13 @@ function App() {
   const observerTarget = useRef(null);
   const isScrolled = useScrollPosition(10);
 
-  // 键盘快捷键支持
+  // Keyboard shortcut support
   useKeyboardNavigation({
     onEscape: () => {
       if (showAbout) setShowAbout(false);
       if (showLikes) setShowLikes(false);
     },
-    enabled: !showAbout && !showLikes, // 只在没有模态框时启用
+    enabled: !showAbout && !showLikes, // Only enable when no modals are open
   });
 
   const handleObserver = useCallback(
@@ -59,22 +59,9 @@ function App() {
     fetchArticles();
   }, []);
 
-  // 监听语言变化事件
-  useEffect(() => {
-    const handleLanguageChange = () => {
-      // 语言变化后重新获取文章
-      setTimeout(() => fetchArticles(), 200);
-    };
-
-    window.addEventListener('languageChanged', handleLanguageChange);
-    return () => window.removeEventListener('languageChanged', handleLanguageChange);
-  }, [fetchArticles]);
-
-
-
   return (
     <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll">
-      {/* 半透明导航栏背景 */}
+      {/* Semi-transparent navigation bar background */}
       <div className={`fixed top-0 left-0 right-0 h-20 z-40 transition-all duration-300 ${
         isScrolled 
           ? 'bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg' 
@@ -93,9 +80,9 @@ function App() {
       </div>
 
       <div className="fixed top-4 right-4 z-50">
-        {/* 现代设计感按钮组 */}
+        {/* Modern design button group */}
         <div className="flex items-center gap-3">
-          {/* 功能按钮组 */}
+          {/* Function button group */}
           <div className={`modern-button-group flex items-center rounded-full p-1 border shadow-lg transition-all duration-300 ${
             isScrolled 
               ? 'bg-white/90 backdrop-blur-xl border-white/30' 
@@ -117,7 +104,7 @@ function App() {
             </button>
           </div>
           
-          {/* 语言选择器 - 独立设计，确保最高层级 */}
+          {/* Language selector - Independent design, ensure highest level */}
           <div className={`rounded-full p-1 border shadow-lg relative transition-all duration-300 ${
             isScrolled 
               ? 'bg-white/90 backdrop-blur-xl border-white/30' 
@@ -128,29 +115,29 @@ function App() {
         </div>
       </div>
 
-      {/* 模态框组件 */}
+      {/* Modal components */}
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
 
       <LikesModal isOpen={showLikes} onClose={() => setShowLikes(false)} />
       
-      {/* 错误通知 */}
+      {/* Error notification */}
       <ErrorNotification 
         error={error} 
         onClose={clearError}
       />
 
-      {/* 内容区域 */}
+      {/* Content area */}
       <div className="masonry-grid">
         {articles.map((article) => (
           <WikiCard key={article.pageid} article={article} />
         ))}
         
-        {/* 滚动加载时显示骨架屏 - 只在有内容且正在加载时显示 */}
+        {/* Show skeleton when loading more - only when there's content and loading */}
         {loading && articles.length > 0 && (
           <LoadingSkeletonCards />
         )}
         
-        {/* 初始加载时的骨架屏 - 在同一个容器中 */}
+        {/* Initial loading skeleton - in the same container */}
         {articles.length === 0 && loading && (
           <SkeletonGrid count={6} />
         )}
@@ -158,7 +145,7 @@ function App() {
         <div ref={observerTarget} className="h-10 col-span-full" />
       </div>
       
-      {/* 加载更多时的指示器 */}
+      {/* Loading indicator when loading more */}
       {loading && articles.length > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 glass-effect px-6 py-3 rounded-full shadow-lg border border-white/20">
           <Loader2 className="h-5 w-5 animate-spin text-slate-700" />

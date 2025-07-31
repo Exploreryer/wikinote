@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useLocalization } from "./useLocalization";
 import { useI18n } from "./useI18n";
 import type { WikiArticle, AppError } from "../types/ArticleProps";
@@ -117,18 +117,6 @@ export function useWikiArticles() {
   }, [buffer, fetchArticles]);
 
   const clearError = () => setError(null);
-
-  // 监听语言变化事件
-  useEffect(() => {
-    const handleLanguageChange = () => {
-      setArticles([]);
-      setBuffer([]);
-      setError(null);
-    };
-
-    window.addEventListener('languageChanged', handleLanguageChange);
-    return () => window.removeEventListener('languageChanged', handleLanguageChange);
-  }, []);
 
   return { 
     articles, 
