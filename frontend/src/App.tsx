@@ -6,6 +6,7 @@ import { LanguageSelector } from "./components/LanguageSelector";
 import { AboutModal } from "./components/AboutModal";
 import { LikesModal } from "./components/LikesModal";
 import { ErrorNotification } from "./components/ErrorNotification";
+import { isExtension } from "./utils/environment";
 
 import { useWikiArticles } from "./hooks/useWikiArticles";
 import { useScrollPosition } from "./hooks/useScrollPosition";
@@ -153,7 +154,7 @@ function App() {
           <span className="text-slate-700 font-medium">{t('common.loadingMore')}</span>
         </div>
       )}
-      <Analytics />
+      {!isExtension && <Analytics />}
     </div>
   );
 }

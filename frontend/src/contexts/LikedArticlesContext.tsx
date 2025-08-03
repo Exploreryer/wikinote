@@ -1,20 +1,29 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { WikiArticle, LikedArticlesContextType } from "../types/ArticleProps";
 import { Heart } from "lucide-react";
+import { StorageAdapter } from "../utils/environment";
 import '../assets/heartAnimation.css';
 
 const LikedArticlesContext = createContext<LikedArticlesContextType | undefined>(undefined);
 
 export function LikedArticlesProvider({ children }: { children: ReactNode }) {
-    const [likedArticles, setLikedArticles] = useState<WikiArticle[]>(() => {
-        const saved = localStorage.getItem("likedArticles");
-        return saved ? JSON.parse(saved) : [];
-    });
-
+    const [likedArticles, setLikedArticles] = useState<WikiArticle[]>([]);
     const [showHeart, setShowHeart] = useState(false);
 
+    // 初始化时从存储加载数据
     useEffect(() => {
-        localStorage.setItem("likedArticles", JSON.stringify(likedArticles));
+        StorageAdapter.get("likedArticles").then((saved) => {
+            if (saved) {
+                setLikedArticles(saved);
+            }
+        });
+    }, []);
+
+    // 当数据变化时保存到存储
+    useEffect(() => {
+        if (likedArticles.length > 0 || likedArticles.length === 0) {
+            StorageAdapter.set("likedArticles", likedArticles);
+        }
     }, [likedArticles]);
 
     const toggleLike = (article: WikiArticle) => {

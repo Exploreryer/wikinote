@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run build:web",
+    "build:web": "tsc -b && node scripts/build-web.js",
+    "build:extension": "tsc -b && node scripts/build-extension.js",
+    "build:all": "node scripts/build-all.js",
+    "install:extension": "node scripts/install-extension.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

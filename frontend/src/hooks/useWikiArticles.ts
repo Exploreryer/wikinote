@@ -3,6 +3,7 @@ import { useLocalization } from "./useLocalization";
 import { useI18n } from "./useI18n";
 import type { WikiArticle, AppError } from "../types/ArticleProps";
 import { retry, preloadImages } from "../utils/performance";
+import { fetchWithCORS } from "../utils/environment";
 
 export function useWikiArticles() {
   const [articles, setArticles] = useState<WikiArticle[]>([]);
@@ -19,7 +20,7 @@ export function useWikiArticles() {
     
     try {
       const fetchWithRetry = () => retry(async () => {
-        const response = await fetch(
+        const response = await fetchWithCORS(
           currentLanguage.api +
             new URLSearchParams({
               action: "query",

@@ -12,7 +12,7 @@ const translations: Record<string, Translations> = {
 
 export function useI18n() {
   // 强制使用英文界面，忽略浏览器语言设置
-  const [currentLocale, setCurrentLocale] = useState<string>(() => {
+  const [currentLocale] = useState<string>(() => {
     const saved = localStorage.getItem('locale');
     // 如果之前保存的是中文，也强制改为英文
     if (saved === 'zh') {
@@ -44,7 +44,7 @@ export function useI18n() {
     return typeof value === 'string' ? value : key;
   };
 
-  const setLocale = (locale: string) => {
+  const setLocale = (_locale: string) => {
     // 忽略任何语言切换请求，始终保持英文
     console.log('Interface language is locked to English');
   };
