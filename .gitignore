@@ -11,6 +11,9 @@ frontend/dist/
 frontend/dist-ssr/
 *.local
 
+# Assets and backups (not version controlled)
+frontend/assets/
+
 # Environment files
 .env
 .env.local
