@@ -54,7 +54,7 @@ html, body {
 
 /* 呼吸式光晕 - Microsoft Fluent风格 */
 .gradient-bg::after {
-  content: '';
+  /* content: ''; */
   position: absolute;
   top: 0;
   left: 0;
@@ -157,6 +157,10 @@ html, body {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   overflow: hidden;
+  border-radius: 50%; /* 确保按钮为圆形 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .glass-button::before {
@@ -198,6 +202,9 @@ html, body {
     linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.3)),
     rgba(255, 255, 255, 0.15);
   border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 
+    0 8px 32px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .glass-button.liked:hover {
@@ -205,6 +212,30 @@ html, body {
     linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(239, 68, 68, 0.4)),
     rgba(255, 255, 255, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 
+    0 12px 40px rgba(239, 68, 68, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* 分享按钮的特殊状态 */
+.glass-button.share-active {
+  background: 
+    linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.3)),
+    rgba(255, 255, 255, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 
+    0 8px 32px rgba(59, 130, 246, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.glass-button.share-active:hover {
+  background: 
+    linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(59, 130, 246, 0.4)),
+    rgba(255, 255, 255, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 
+    0 12px 40px rgba(59, 130, 246, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* 自适应对比度按钮 - 确保在任何背景下都可见 */

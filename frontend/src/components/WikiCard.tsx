@@ -8,11 +8,13 @@ import '../styles/WikiCard.css';
 export function WikiCard({ article }: ArticleProps) {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [shareError, setShareError] = useState(false);
+    const [shareSuccess, setShareSuccess] = useState(false);
     const { toggleLike, isLiked } = useLikedArticles();
     const { t } = useI18n();
 
     const handleShare = async () => {
         setShareError(false);
+        setShareSuccess(false);
         
         if (navigator.share) {
             try {
@@ -21,6 +23,8 @@ export function WikiCard({ article }: ArticleProps) {
                     text: article.extract || '',
                     url: article.url
                 });
+                setShareSuccess(true);
+                setTimeout(() => setShareSuccess(false), 2000);
             } catch (error) {
                 if ((error as Error).name !== 'AbortError') {
                     console.error('Error sharing:', error);
@@ -31,6 +35,8 @@ export function WikiCard({ article }: ArticleProps) {
             // Fallback: Copy to clipboard
             try {
                 await navigator.clipboard.writeText(article.url);
+                setShareSuccess(true);
+                setTimeout(() => setShareSuccess(false), 2000);
                 // Use better notification method
                 const notification = document.createElement('div');
                 notification.textContent = t('common.copied');
@@ -68,7 +74,7 @@ export function WikiCard({ article }: ArticleProps) {
                 <div className="absolute top-4 right-4 flex gap-2">
                     <button
                         onClick={() => toggleLike(article)}
-                        className={`p-2.5 rounded-full glass-button ${isLiked(article.pageid) 
+                        className={`w-10 h-10 glass-button flex items-center justify-center ${isLiked(article.pageid) 
                             ? 'text-red-500 liked' 
                             : 'text-white hover:text-red-500'
                         }`}
@@ -79,7 +85,7 @@ export function WikiCard({ article }: ArticleProps) {
                     </button>
                     <button
                         onClick={handleShare}
-                        className={`p-2.5 rounded-full glass-button text-white hover:text-blue-500 ${shareError ? 'text-red-500' : ''}`}
+                        className={`w-10 h-10 glass-button flex items-center justify-center text-white hover:text-blue-500 ${shareError ? 'text-red-500' : ''} ${shareSuccess ? 'share-active' : ''}`}
                         aria-label={t('common.share')}
                         title={t('common.share')}
                     >

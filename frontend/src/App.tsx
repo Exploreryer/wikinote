@@ -21,7 +21,8 @@ function App() {
 
   const { t } = useI18n();
   const observerTarget = useRef(null);
-  const isScrolled = useScrollPosition(10);
+  const { scrollY, isScrolled } = useScrollPosition(30);
+  const titleOpacity = Math.max(0, 1 - (scrollY / 80));
 
   // Keyboard shortcut support
   useKeyboardNavigation({
@@ -61,19 +62,19 @@ function App() {
 
   return (
     <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll">
-      {/* Semi-transparent navigation bar background */}
-      <div className={`fixed top-0 left-0 right-0 h-20 z-40 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg' 
-          : 'bg-transparent'
-      }`}></div>
+
 
       <div className="fixed top-4 left-4 z-50">
         <button
           onClick={() => window.location.reload()}
-          className={`text-2xl font-bold text-glow hover:opacity-90 transition-all duration-300 px-2 py-1 hover:scale-105 ${
-            isScrolled ? 'text-slate-800' : 'text-slate-800'
+          className={`text-2xl font-bold text-glow hover:opacity-90 transition-all duration-300 px-2 py-1 hover:scale-105 text-slate-800 ${
+            titleOpacity === 0 ? 'pointer-events-none' : ''
           }`}
+          style={{
+            opacity: titleOpacity,
+            transform: `translateY(${titleOpacity === 0 ? '-10px' : '0'})`,
+            transition: 'all 0.3s ease-in-out'
+          }}
         >
           {t('app.title')}
         </button>
@@ -85,7 +86,7 @@ function App() {
           {/* Function button group */}
           <div className={`modern-button-group flex items-center rounded-full p-1 border shadow-lg transition-all duration-300 ${
             isScrolled 
-              ? 'bg-white/90 backdrop-blur-xl border-white/30' 
+              ? 'bg-white/95 backdrop-blur-xl border-white/40 shadow-xl' 
               : 'bg-white/10 backdrop-blur-xl border-white/20'
           }`}>
             <button
@@ -107,7 +108,7 @@ function App() {
           {/* Language selector - Independent design, ensure highest level */}
           <div className={`rounded-full p-1 border shadow-lg relative transition-all duration-300 ${
             isScrolled 
-              ? 'bg-white/90 backdrop-blur-xl border-white/30' 
+              ? 'bg-white/95 backdrop-blur-xl border-white/40 shadow-xl' 
               : 'bg-white/10 backdrop-blur-xl border-white/20'
           }`} style={{ zIndex: 9998, overflow: 'visible' }}>
             <LanguageSelector />
