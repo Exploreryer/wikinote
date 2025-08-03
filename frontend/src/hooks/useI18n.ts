@@ -11,37 +11,32 @@ const translations: Record<string, Translations> = {
 };
 
 export function useI18n() {
+  // 强制使用英文界面，忽略浏览器语言设置
   const [currentLocale, setCurrentLocale] = useState<string>(() => {
     const saved = localStorage.getItem('locale');
-    if (saved && translations[saved]) {
-      return saved;
+    // 如果之前保存的是中文，也强制改为英文
+    if (saved === 'zh') {
+      localStorage.setItem('locale', 'en');
+      return 'en';
     }
-    // 检测浏览器语言
-    const browserLang = navigator.language.toLowerCase();
-    if (browserLang.startsWith('zh')) {
-      return 'zh';
+    // 只允许英文，其他语言都强制为英文
+    if (saved && saved !== 'en') {
+      localStorage.setItem('locale', 'en');
+      return 'en';
     }
-    return 'en';
+    return 'en'; // 默认始终为英文
   });
 
   useEffect(() => {
-    localStorage.setItem('locale', currentLocale);
+    // 确保始终保存为英文
+    localStorage.setItem('locale', 'en');
   }, [currentLocale]);
 
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
-    let value: any = translations[currentLocale];
+    // 始终使用英文翻译
+    let value: any = translations.en;
     
-    for (const k of keys) {
-      value = value?.[k];
-    }
-    
-    if (typeof value === 'string') {
-      return value;
-    }
-    
-    // 降级到英文
-    value = translations.en;
     for (const k of keys) {
       value = value?.[k];
     }
@@ -50,15 +45,14 @@ export function useI18n() {
   };
 
   const setLocale = (locale: string) => {
-    if (translations[locale]) {
-      setCurrentLocale(locale);
-    }
+    // 忽略任何语言切换请求，始终保持英文
+    console.log('Interface language is locked to English');
   };
 
   return {
     t,
-    currentLocale,
+    currentLocale: 'en', // 始终返回英文
     setLocale,
-    availableLocales: Object.keys(translations),
+    availableLocales: ['en'], // 只提供英文选项
   };
 }
