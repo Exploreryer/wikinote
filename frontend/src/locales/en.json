@@ -10,7 +10,9 @@
     "description": "A RedNote-inspired interface for exploring random Wikipedia articles. This project builds upon IsaacGemal's wikitok, enhancing it for a more immersive web browsing experience.",
     "madeWith": "Made with ❤️ by",
     "specialThanks": "Special thanks to IsaacGemal for the original inspiration and foundational work.",
-    "checkCode": "Check out the code on"
+    "checkCode": "Check out the code on",
+    "support": "If you enjoy WikiNote, consider buying me a coffee :)",
+    "buyMeCoffee": "Buy me a coffee"
   },
   "likes": {
     "title": "Liked Articles",

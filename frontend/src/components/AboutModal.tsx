@@ -64,6 +64,21 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
               GitHub
             </a>
           </p>
+          
+          <div className="pt-4 border-t border-slate-200">
+            <p className="text-slate-600 mb-3">
+              {t('about.support')}
+            </p>
+            <a
+              href="https://buymeacoffee.com/exploreryer"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors duration-200 font-medium"
+            >
+              <span className="text-lg">☕</span>
+              {t('about.buyMeCoffee')}
+            </a>
+          </div>
         </div>
       </div>
       

@@ -1,24 +1,12 @@
 import { useState, useEffect } from 'react';
 import enTranslations from '../locales/en.json';
-import zhTranslations from '../locales/zh.json';
 
 type TranslationKey = string;
 type Translations = typeof enTranslations;
 
-const translations: Record<string, Translations> = {
-  en: enTranslations,
-  zh: zhTranslations,
-};
-
 export function useI18n() {
-  // 强制使用英文界面，忽略浏览器语言设置
   const [currentLocale] = useState<string>(() => {
     const saved = localStorage.getItem('locale');
-    // 如果之前保存的是中文，也强制改为英文
-    if (saved === 'zh') {
-      localStorage.setItem('locale', 'en');
-      return 'en';
-    }
     // 只允许英文，其他语言都强制为英文
     if (saved && saved !== 'en') {
       localStorage.setItem('locale', 'en');
@@ -35,7 +23,7 @@ export function useI18n() {
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
     // 始终使用英文翻译
-    let value: any = translations.en;
+    let value: any = enTranslations;
     
     for (const k of keys) {
       value = value?.[k];
