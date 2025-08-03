@@ -66,18 +66,20 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
           </p>
           
           <div className="pt-4 border-t border-slate-200">
-            <p className="text-slate-600 mb-3">
+            <p className="text-slate-600 mb-4 text-center">
               {t('about.support')}
             </p>
-            <a
-              href="https://buymeacoffee.com/exploreryer"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors duration-200 font-medium"
-            >
-              <span className="text-lg">☕</span>
-              {t('about.buyMeCoffee')}
-            </a>
+            <div className="flex justify-center">
+              <a
+                href="https://buymeacoffee.com/exploreryer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+              >
+                <span className="text-xl">☕</span>
+                {t('about.buyMeCoffee')}
+              </a>
+            </div>
           </div>
         </div>
       </div>
