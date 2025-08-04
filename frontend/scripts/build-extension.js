@@ -4,7 +4,7 @@ import { build } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { copyFile, mkdir } from 'fs/promises';
+import { copyFile, mkdir, readdir, writeFile, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,8 +21,6 @@ async function copyManifest() {
     console.log('📄 Manifest.json copied');
   } catch (error) {
     console.error('❌ Failed to copy manifest.json:', error);
-    console.error('Source path:', manifestSrc);
-    console.error('Dest path:', manifestDest);
   }
 }
 
@@ -36,7 +34,7 @@ async function copyIcons() {
       await mkdir(iconsDest, { recursive: true });
     }
     
-    // 复制图标文件（这里需要根据实际图标文件调整）
+    // 复制图标文件
     const iconFiles = [
       'favicon-96x96.png',
       'web-app-manifest-192x192.png',
@@ -57,103 +55,67 @@ async function copyIcons() {
   }
 }
 
-async function moveBuiltFiles() {
-  const { copyFile, readdir, existsSync, writeFile, readFile } = await import('fs/promises');
-  const { existsSync: fsExistsSync } = await import('fs');
-  
-  // 直接复制构建文件到目标目录
+async function copyBuiltFiles() {
   const targetDir = resolve(__dirname, '../dist/extension');
-  const sourceDir = resolve(__dirname, '../configs/extension');
   
   try {
-    // 复制并修复HTML文件
-    let htmlContent = await readFile(resolve(sourceDir, 'newtab.html'), 'utf8');
+    // 查找构建的文件 - Vite输出到相对路径
+    const possibleSourceDirs = [
+      resolve(__dirname, '../dist/extension/configs/extension'),
+      resolve(__dirname, '../../dist/extension/configs/extension'),
+      resolve(__dirname, '../dist/extension'),
+      resolve(__dirname, '../dist'),
+      resolve(__dirname, '../../dist/extension'),
+    ];
     
-    // 修复HTML文件中的路径
-    htmlContent = htmlContent.replace(
-      'src="/src/main.tsx"',
-      'src="./newtab.js"'
-    );
+    let sourceDir = null;
+    for (const dir of possibleSourceDirs) {
+      if (existsSync(dir)) {
+        const files = await readdir(dir);
+        if (files.some(f => f.endsWith('.js') || f.endsWith('.html') || f.endsWith('.css'))) {
+          sourceDir = dir;
+          break;
+        }
+      }
+    }
     
-    // 确保CSS链接存在
-    if (!htmlContent.includes('<link rel="stylesheet" href="./newtab.css">')) {
+    if (!sourceDir) {
+      throw new Error('No built files found');
+    }
+    
+    console.log(`📁 Found built files in: ${sourceDir}`);
+    
+    // 复制HTML文件
+    const htmlSrc = resolve(sourceDir, 'newtab.html');
+    const htmlDest = resolve(targetDir, 'newtab.html');
+    
+    if (existsSync(htmlSrc)) {
+      let htmlContent = await readFile(htmlSrc, 'utf8');
+      
+      // 修复HTML文件中的路径
       htmlContent = htmlContent.replace(
-        '<title>New Tab - WikiNote</title>',
-        '<title>New Tab - WikiNote</title>\n    <link rel="stylesheet" href="./newtab.css">'
+        'src="/src/main.tsx"',
+        'src="./newtab.js"'
       );
+      
+      await writeFile(htmlDest, htmlContent);
+      console.log('📄 Copied and fixed: newtab.html');
     }
     
-    await writeFile(resolve(targetDir, 'newtab.html'), htmlContent);
-    console.log('📄 Copied and fixed: newtab.html');
-    
-    // 查找并复制构建的JS和CSS文件
-    const builtDir = resolve(__dirname, '../dist/extension/configs/extension');
-    const altBuiltDir = resolve(__dirname, '../../dist/extension/configs/extension');
-    
-    if (fsExistsSync(builtDir)) {
-      const files = await readdir(builtDir);
-      
-      for (const file of files) {
-        if (file.endsWith('.js') || file.endsWith('.css')) {
-          await copyFile(resolve(builtDir, file), resolve(targetDir, file));
-          console.log(`📄 Copied: ${file}`);
-        }
-      }
-    } else {
-      console.log('📁 Built files directory not found, checking alternative locations...');
-      
-      // 检查其他可能的位置
-      const possibleDirs = [
-        altBuiltDir,
-        resolve(__dirname, '../dist'),
-        resolve(__dirname, '../dist/extension'),
-        resolve(__dirname, '../../dist/extension'),
-      ];
-      
-      let filesFound = false;
-      for (const dir of possibleDirs) {
-        if (fsExistsSync(dir)) {
-          const files = await readdir(dir);
-          const jsFiles = files.filter(f => f.endsWith('.js') && !f.includes('placeholder'));
-          const cssFiles = files.filter(f => f.endsWith('.css') && !f.includes('placeholder'));
-          
-          for (const file of [...jsFiles, ...cssFiles]) {
-            await copyFile(resolve(dir, file), resolve(targetDir, file));
-            console.log(`📄 Copied: ${file} from ${dir}`);
-            filesFound = true;
-          }
-        }
-      }
-      
-      if (!filesFound) {
-        console.log('📁 No built files found, checking Vite build output...');
-        
-        // 检查Vite构建的实际输出
-        const viteOutputDir = resolve(__dirname, '../dist/extension');
-        if (fsExistsSync(viteOutputDir)) {
-          const files = await readdir(viteOutputDir);
-          const jsFiles = files.filter(f => f.endsWith('.js') && !f.includes('placeholder'));
-          const cssFiles = files.filter(f => f.endsWith('.css') && !f.includes('placeholder'));
-          
-          if (jsFiles.length > 0 || cssFiles.length > 0) {
-            console.log('📄 Found Vite built files in extension directory');
-            filesFound = true;
-          }
-        }
-        
-        if (!filesFound) {
-          console.log('📁 No built files found, creating placeholder files...');
-          // 创建占位符文件
-          await writeFile(resolve(targetDir, 'newtab.js'), '// Placeholder JS file');
-          await writeFile(resolve(targetDir, 'newtab.css'), '/* Placeholder CSS file */');
-          console.log('📄 Created placeholder files');
-        }
+    // 复制JS和CSS文件
+    const files = await readdir(sourceDir);
+    for (const file of files) {
+      if (file.endsWith('.js') || file.endsWith('.css')) {
+        const src = resolve(sourceDir, file);
+        const dest = resolve(targetDir, file);
+        await copyFile(src, dest);
+        console.log(`📄 Copied: ${file}`);
       }
     }
     
-    console.log('📁 Files copied to correct location');
   } catch (error) {
-    console.error('❌ Error copying files:', error);
+    console.error('❌ Error copying built files:', error);
+    throw error;
   }
 }
 
@@ -161,13 +123,20 @@ async function buildExtension() {
   console.log('🚀 Building Chrome Extension...');
   
   try {
+    // 确保目标目录存在
+    const targetDir = resolve(__dirname, '../dist/extension');
+    if (!existsSync(targetDir)) {
+      await mkdir(targetDir, { recursive: true });
+    }
+    
+    // 构建项目
     await build({
       configFile: extensionConfig,
       mode: 'production',
     });
     
-    // 移动构建的文件到正确位置
-    await moveBuiltFiles();
+    // 复制构建的文件
+    await copyBuiltFiles();
     
     // 复制必要的文件
     await copyManifest();

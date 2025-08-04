@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import enTranslations from '../locales/en.json';
 
 type TranslationKey = string;
-type Translations = typeof enTranslations;
 
 export function useI18n() {
   const [currentLocale] = useState<string>(() => {

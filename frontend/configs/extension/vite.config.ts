@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    outDir: "../../dist/extension",
+    outDir: resolve(__dirname, "../../dist/extension"),
     emptyOutDir: true,
     rollupOptions: {
       input: {

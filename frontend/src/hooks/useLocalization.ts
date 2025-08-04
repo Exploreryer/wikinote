@@ -1,19 +1,27 @@
 import { useState, useEffect, useCallback } from "react";
 import { LANGUAGES } from "../languages";
 import type { Language } from "../types/ArticleProps";
+import { StorageAdapter } from "../utils/environment";
 
 export function useLocalization() {
-  const getInitialLanguage = useCallback((): Language => {
-    const savedLanguageId = localStorage.getItem("lang");
+  const getInitialLanguage = useCallback(async (): Promise<Language> => {
+    const savedLanguageId = await StorageAdapter.get("lang");
     return (
       LANGUAGES.find((lang) => lang.id === savedLanguageId) || LANGUAGES[0]
     );
   }, []);
 
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(LANGUAGES[0]);
+
+  // 初始化时从存储加载语言设置
+  useEffect(() => {
+    getInitialLanguage().then((lang) => {
+      setCurrentLanguage(lang);
+    });
+  }, [getInitialLanguage]);
 
   useEffect(() => {
-    localStorage.setItem("lang", currentLanguage.id);
+    StorageAdapter.set("lang", currentLanguage.id);
   }, [currentLanguage]);
 
   const setLanguage = (languageId: string) => {
