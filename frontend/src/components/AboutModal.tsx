@@ -32,18 +32,18 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
           {t('about.title')}
         </h2>
         
-        <p className="mb-6 leading-relaxed text-slate-700">
+        <p className="mb-4 leading-relaxed text-slate-700 text-sm">
           {t('about.description')}
         </p>
         
-        <div className="space-y-3 text-sm">
+        <div className="space-y-4 text-sm">
           <p className="text-slate-600">
             {t('about.madeWith')}{" "}
             <a
               href="https://github.com/Exploreryer"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-700 transition-colors underline decoration-dotted"
+              className="text-blue-600 hover:text-blue-700 transition-colors hover:underline"
             >
               Exploreryer
             </a>
@@ -59,7 +59,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
               href="https://github.com/Exploreryer/wikinote"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-700 transition-colors underline decoration-dotted"
+              className="text-blue-600 hover:text-blue-700 transition-colors hover:underline"
             >
               GitHub
             </a>

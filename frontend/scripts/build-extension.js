@@ -34,13 +34,13 @@ async function copyIcons() {
       await mkdir(iconsDest, { recursive: true });
     }
     
-    // 复制图标文件并生成所需尺寸
+    // 复制图标文件，使用对应尺寸的图标
     const iconMappings = [
-      { src: 'favicon-96x96.png', dest: 'icon-16.png' },
-      { src: 'favicon-96x96.png', dest: 'icon-32.png' },
-      { src: 'favicon-96x96.png', dest: 'icon-48.png' },
+      { src: 'favicon-16x16.png', dest: 'icon-16.png' },
+      { src: 'favicon-32x32.png', dest: 'icon-32.png' },
+      { src: 'favicon-48x48.png', dest: 'icon-48.png' },
       { src: 'favicon-96x96.png', dest: 'icon-96.png' },
-      { src: 'favicon-96x96.png', dest: 'icon-128.png' },
+      { src: 'favicon-128x128.png', dest: 'icon-128.png' },
       { src: 'web-app-manifest-192x192.png', dest: 'icon-192.png' },
       { src: 'web-app-manifest-512x512.png', dest: 'icon-512.png' }
     ];
