@@ -34,20 +34,24 @@ async function copyIcons() {
       await mkdir(iconsDest, { recursive: true });
     }
     
-    // 复制图标文件
-    const iconFiles = [
-      'favicon-96x96.png',
-      'web-app-manifest-192x192.png',
-      'web-app-manifest-512x512.png'
+    // 复制图标文件并生成所需尺寸
+    const iconMappings = [
+      { src: 'favicon-96x96.png', dest: 'icon-16.png' },
+      { src: 'favicon-96x96.png', dest: 'icon-32.png' },
+      { src: 'favicon-96x96.png', dest: 'icon-48.png' },
+      { src: 'favicon-96x96.png', dest: 'icon-96.png' },
+      { src: 'favicon-96x96.png', dest: 'icon-128.png' },
+      { src: 'web-app-manifest-192x192.png', dest: 'icon-192.png' },
+      { src: 'web-app-manifest-512x512.png', dest: 'icon-512.png' }
     ];
     
-    for (const icon of iconFiles) {
-      const src = resolve(iconsSrc, icon);
-      const dest = resolve(iconsDest, icon.replace(/^favicon-|^web-app-manifest-/, 'icon-'));
+    for (const { src: srcFile, dest: destFile } of iconMappings) {
+      const src = resolve(iconsSrc, srcFile);
+      const dest = resolve(iconsDest, destFile);
       
       if (existsSync(src)) {
         await copyFile(src, dest);
-        console.log(`🎨 Icon copied: ${icon}`);
+        console.log(`🎨 Icon copied: ${srcFile} -> ${destFile}`);
       }
     }
   } catch (error) {

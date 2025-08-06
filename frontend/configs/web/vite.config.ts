@@ -11,8 +11,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "WikiNote",
-        short_name: "WikiNote",
+        name: "Wikinote",
+        short_name: "Wikinote",
         icons: [
           {
             src: "/wiki-logo.svg",

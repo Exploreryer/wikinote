@@ -1,4 +1,4 @@
-# WikiNote
+# Wikinote
 
 A RedNote-style waterfall interface for exploring random Wikipedia articles in multiple languages. This project is based on [IsaacGemal/wikitok](https://github.com/IsaacGemal/wikitok), and we have enhanced it with a masonry layout that's more suitable for web browsing.
 
@@ -40,7 +40,7 @@ No backend required!
 
 ## Support
 
-If you enjoy WikiNote, consider buying me a coffee:
+If you enjoy Wikinote, consider buying me a coffee:
 
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/exploreryer)
 

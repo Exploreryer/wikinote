@@ -56,24 +56,37 @@ export function WikiCard({ article }: ArticleProps) {
     return (
         <div className="wiki-card hover:shadow-lg transition-shadow duration-300">
             <div className="wiki-card-image">
-                {article.thumbnail ? (
-                    <img
-                        loading="lazy"
-                        src={article.thumbnail.source}
-                        alt={article.displaytitle}
-                        className={`${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
-                        onLoad={() => setImageLoaded(true)}
-                        onError={(e) => {
-                            console.error('Image failed to load:', e);
-                            setImageLoaded(true);
-                        }}
-                    />
-                ) : (
-                    <div className="bg-gray-200 h-full w-full" />
-                )}
-                <div className="absolute top-4 right-4 flex gap-2">
+                <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full h-full cursor-pointer group"
+                    aria-label={`Read more about ${article.displaytitle}`}
+                    title={`Read more about ${article.displaytitle}`}
+                >
+                    {article.thumbnail ? (
+                        <img
+                            loading="lazy"
+                            src={article.thumbnail.source}
+                            alt={article.displaytitle}
+                            className={`${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300`}
+                            onLoad={() => setImageLoaded(true)}
+                            onError={(e) => {
+                                console.error('Image failed to load:', e);
+                                setImageLoaded(true);
+                            }}
+                        />
+                    ) : (
+                        <div className="bg-gray-200 h-full w-full group-hover:bg-gray-300 transition-colors duration-300" />
+                    )}
+                </a>
+                <div className="absolute top-4 right-4 flex gap-2 z-10">
                     <button
-                        onClick={() => toggleLike(article)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleLike(article);
+                        }}
                         className={`w-10 h-10 glass-button flex items-center justify-center ${isLiked(article.pageid) 
                             ? 'text-red-500 liked' 
                             : 'text-white hover:text-red-500'
@@ -84,7 +97,11 @@ export function WikiCard({ article }: ArticleProps) {
                         <Heart className="w-5 h-5" fill={isLiked(article.pageid) ? 'currentColor' : 'none'} />
                     </button>
                     <button
-                        onClick={handleShare}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleShare();
+                        }}
                         className={`w-10 h-10 glass-button flex items-center justify-center text-white hover:text-blue-500 ${shareError ? 'text-red-500' : ''} ${shareSuccess ? 'share-active' : ''}`}
                         aria-label={t('common.share')}
                         title={t('common.share')}

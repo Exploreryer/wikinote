@@ -24,11 +24,11 @@
 - **插件压缩包**: `dist/wikinote-extension.zip`
 - **插件描述**: 
   ```
-  Transform your new tab into a gateway of knowledge with WikiNote. Discover fascinating Wikipedia articles in an elegant waterfall layout that adapts to your screen.
+  Transform your new tab into a gateway of knowledge with Wikinote. Discover fascinating Wikipedia articles in an elegant waterfall layout that adapts to your screen.
   
-  With support for 40+ languages, WikiNote brings the world's knowledge to your fingertips. Built as an open-source project with privacy-first design - no ads, no tracking, just pure knowledge discovery.
+  With support for 40+ languages, Wikinote brings the world's knowledge to your fingertips. Built as an open-source project with privacy-first design - no ads, no tracking, just pure knowledge discovery.
   
-  Whether you're a lifelong learner or simply curious, WikiNote turns every new tab into an opportunity to learn something new.
+  Whether you're a lifelong learner or simply curious, Wikinote turns every new tab into an opportunity to learn something new.
   
   Project: https://github.com/Exploreryer/wikinote
   ```
@@ -48,7 +48,7 @@
 2. 点击 "Add new item"
 3. 上传 `wikinote-extension.zip` 文件
 4. 填写插件信息：
-   - **名称**: WikiNote - New Tab
+   - **名称**: Wikinote
    - **版本**: 1.0.0
    - **描述**: 详细功能描述
    - **分类**: Productivity 或 Education
@@ -58,15 +58,15 @@
 ### 4. 商店信息填写
 
 #### 基本信息：
-- **名称**: WikiNote - New Tab
+- **名称**: Wikinote
 - **简短描述**: Transform your new tab into a gateway of knowledge discovery
 - **详细描述**: 
   ```
 Turn every new tab into a doorway to curiosity.
 
-WikiNote replaces your new tab with a stream of Wikipedia articles — dynamically surfaced to surprise, inform, and inspire.
+Wikinote replaces your new tab with a stream of Wikipedia articles — dynamically surfaced to surprise, inform, and inspire.
 
-What makes WikiNote special:
+What makes Wikinote special:
 
 • A clean, responsive waterfall layout that adapts to any screen
 • Wikipedia content in 40+ languages, changing with every tab
@@ -77,7 +77,7 @@ There’s no curation, no agenda — just the joy of discovery through the world
 
 💻 Explore the code or contribute: https://github.com/Exploreryer/wikinote
 
-If you enjoy using WikiNote, feel free to leave a review or share your feedback — your ideas help shape its future. 🚀
+If you enjoy using Wikinote, feel free to leave a review or share your feedback — your ideas help shape its future. 🚀
   ```
 
 #### 分类和标签：
@@ -114,7 +114,7 @@ The extension fetches content from Wikipedia's public API (https://*.wikipedia.o
 
 #### 单一用途说明：
 ```
-WikiNote transforms the new tab page to display random Wikipedia articles in a beautiful waterfall layout. The extension's single purpose is to provide users with an engaging knowledge discovery experience every time they open a new tab, featuring articles from Wikipedia in multiple languages with no ads or tracking.
+Wikinote transforms the new tab page to display random Wikipedia articles in a beautiful waterfall layout. The extension's single purpose is to provide users with an engaging knowledge discovery experience every time they open a new tab, featuring articles from Wikipedia in multiple languages with no ads or tracking.
 ```
 
 #### 数据使用要点：
