@@ -13,9 +13,9 @@ export function LikedArticlesProvider({ children }: { children: ReactNode }) {
 
     // Initialize liked articles from storage on mount
     useEffect(() => {
-        StorageAdapter.get("likedArticles").then((saved) => {
-            if (saved) {
-                setLikedArticles(saved);
+        StorageAdapter.get<WikiArticle[]>("likedArticles").then((saved) => {
+            if (Array.isArray(saved)) {
+                setLikedArticles(saved as WikiArticle[]);
             }
         });
     }, []);

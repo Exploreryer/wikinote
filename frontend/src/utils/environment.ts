@@ -66,7 +66,7 @@ export class StorageAdapter {
   static async remove(key: string): Promise<void> {
     if (isExtension && typeof chrome !== 'undefined') {
       return new Promise((resolve) => {
-        chrome.storage.local.remove([key], resolve);
+        chrome!.storage!.local.remove([key], resolve);
       });
     } else {
       localStorage.removeItem(key);

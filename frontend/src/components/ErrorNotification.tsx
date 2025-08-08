@@ -18,6 +18,11 @@ export function ErrorNotification({
 }: ErrorNotificationProps) {
   const { t } = useI18n();
   const [isVisible, setIsVisible] = useState(false);
+  
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(onClose, 300); // Wait for animation
+  }, [onClose]);
 
   useEffect(() => {
     if (error) {
@@ -30,11 +35,6 @@ export function ErrorNotification({
       }
     }
   }, [error, autoClose, duration, handleClose]);
-
-  const handleClose = useCallback(() => {
-    setIsVisible(false);
-    setTimeout(onClose, 300); // Wait for animation
-  }, [onClose]);
 
   if (!error) return null;
 
