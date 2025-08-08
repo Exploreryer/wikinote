@@ -9,9 +9,11 @@ import { ErrorNotification } from "./components/ErrorNotification";
 import { isExtension } from "./utils/environment";
 
 import { useWikiArticles } from "./hooks/useWikiArticles";
+import { useLocalization } from "./hooks/useLocalization";
 import { useScrollPosition } from "./hooks/useScrollPosition";
 import { useI18n } from "./hooks/useI18n";
 import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
+import { useImagePreloader } from "./hooks/useImagePreloader";
 import { SkeletonGrid, LoadingSkeletonCards } from "./components/SkeletonCard";
 import { createLazyLoadObserver } from "./utils/performance";
 
@@ -19,11 +21,23 @@ function App() {
   const [showAbout, setShowAbout] = useState(false);
   const [showLikes, setShowLikes] = useState(false);
   const { articles, loading, error, clearError, fetchArticles } = useWikiArticles();
+  const { ready } = useLocalization();
 
   const { t } = useI18n();
   const observerTarget = useRef(null);
   const { scrollY, isScrolled } = useScrollPosition(30);
   const titleOpacity = Math.max(0, 1 - (scrollY / 80));
+
+  // Preload images for better user experience
+  const imageUrls = articles
+    .filter(article => article.thumbnail)
+    .map(article => article.thumbnail!.source);
+  
+  useImagePreloader(imageUrls, {
+    enabled: articles.length > 0,
+    maxConcurrent: 2, // Conservative to avoid overwhelming the browser
+    priority: 'normal'
+  });
 
   // Keyboard shortcut support
   useKeyboardNavigation({
@@ -47,7 +61,8 @@ function App() {
   useEffect(() => {
     const observer = createLazyLoadObserver(handleObserver, {
       threshold: 0.1,
-      rootMargin: "100px",
+      // Prefetch content earlier to reduce visible pop-in
+      rootMargin: "400px",
     });
 
     if (observerTarget.current) {
@@ -58,8 +73,10 @@ function App() {
   }, [handleObserver]);
 
   useEffect(() => {
-    fetchArticles();
-  }, []);
+    if (ready) {
+      fetchArticles();
+    }
+  }, [ready]);
 
   return (
     <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll">

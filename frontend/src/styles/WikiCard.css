@@ -1,10 +1,10 @@
-/* 瀑布流布局容器 - 使用Grid布局实现真正的从上至下加载 */
+/* Masonry grid container using CSS Grid */
 .masonry-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   padding: 24px;
-  padding-top: 80px; /* 减少顶部留白 */
+  padding-top: 80px; /* Reduce top spacing */
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -35,7 +35,7 @@
 
 }
 
-/* 真正的macOS风格卡片 */
+/* macOS-like frosted glass card */
 .wiki-card {
   position: relative;
   border-radius: 24px;
@@ -53,7 +53,7 @@
   will-change: transform;
 }
 
-/* 移除固定的动画延迟，让新卡片自然地从上至下出现 */
+/* No fixed animation delay so cards appear naturally */
 .wiki-card {
   animation-delay: 0s;
 }
@@ -66,16 +66,17 @@
   border-color: rgba(255, 255, 255, 0.22);
 }
 
-/* 卡片图片容器 - 调整为60%高度，让卡片更长一些 */
+/* Card image container with 60% aspect ratio */
 .wiki-card-image {
   position: relative;
   width: 100%;
-  padding-top: 60%; /* 从50%改为60%，让图片区域占60% */
+  padding-top: 60%; /* Increase image area to 60% */
   overflow: hidden;
   border-radius: 20px 20px 0 0;
+  background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(241,245,249,0.12));
 }
 
-/* 图片链接容器 */
+/* Image link container */
 .wiki-card-image a {
   position: absolute;
   top: 0;
@@ -97,20 +98,182 @@
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 悬停效果 - 通过group-hover类来触发 */
+/* Hover effect driven by group-hover */
 .wiki-card-image a:hover img,
 .wiki-card:hover .wiki-card-image img {
   transform: scale(1.08);
 }
 
-/* 无图片时的占位符悬停效果 */
+/* Premium Progressive Image Loading - 高级渐显效果 */
+.progressive-image-premium {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: filter, transform, opacity;
+  
+  /* 强制 GPU 加速 */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  
+  /* 高质量图片渲染 */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  
+  /* 关键：确保图片始终覆盖整个容器 */
+  min-width: 100%;
+  min-height: 100%;
+  
+  /* 防止图片在加载时跳动 */
+  display: block;
+}
+
+/* 为不同状态定义精确的动画 - 更柔和的时间设置 */
+.progressive-state-initial {
+  opacity: 0 !important;
+  filter: blur(30px) saturate(120%) !important;
+  transform: scale(1.1) translateZ(0) !important;
+  transition: none !important; /* 初始状态不需要过渡 */
+}
+
+.progressive-state-entering {
+  transition: all 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1000ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+.progressive-state-lowRes,
+.progressive-state-mediumRes,
+.progressive-state-highRes,
+.progressive-state-loaded {
+  transition: all 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1000ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+.progressive-state-error {
+  transition: all 800ms ease-out !important;
+}
+
+/* Progressive loading states with smoother transitions */
+.progressive-placeholder {
+  filter: blur(20px) saturate(120%);
+  transform: scale(1.05);
+  opacity: 0.6;
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressive-low-res {
+  filter: blur(15px) saturate(110%);
+  transform: scale(1.03);
+  opacity: 0.8;
+  transition: all 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressive-medium-res {
+  filter: blur(8px) saturate(105%);
+  transform: scale(1.015);
+  opacity: 0.9;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressive-high-res {
+  filter: blur(2px) saturate(102%);
+  transform: scale(1.005);
+  opacity: 0.95;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressive-loaded {
+  filter: blur(0px) saturate(100%);
+  transform: scale(1);
+  opacity: 1;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressive-error {
+  filter: grayscale(100%) brightness(80%);
+  opacity: 0.5;
+  transition: all 300ms ease-out;
+}
+
+/* Legacy support for existing wiki-image classes */
+.wiki-image.is-loading {
+  filter: blur(10px) saturate(120%);
+  transform: scale(1.022);
+  opacity: 0.82;
+  transition: filter 600ms cubic-bezier(0.4, 0, 0.2, 1), opacity 600ms cubic-bezier(0.4, 0, 0.2, 1), transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: filter, transform, opacity;
+}
+
+.wiki-image.is-loaded {
+  filter: blur(0px) saturate(100%);
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* 高级 Hover 效果 - 适配更柔和的渐显系统 */
+.wiki-card-image a:hover .progressive-image-premium,
+.wiki-card:hover .progressive-image-premium {
+  transition: all 600ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+/* 针对不同加载状态的精确 hover 效果 */
+.wiki-card-image a:hover .progressive-state-initial {
+  transform: scale(1.15) translateZ(0) !important;
+}
+
+.wiki-card-image a:hover .progressive-state-entering {
+  transform: scale(1.13) translateZ(0) !important;
+}
+
+.wiki-card-image a:hover .progressive-state-lowRes {
+  transform: scale(1.11) translateZ(0) !important;
+}
+
+.wiki-card-image a:hover .progressive-state-mediumRes {
+  transform: scale(1.09) translateZ(0) !important;
+}
+
+.wiki-card-image a:hover .progressive-state-highRes {
+  transform: scale(1.08) translateZ(0) !important;
+}
+
+.wiki-card-image a:hover .progressive-state-loaded {
+  transform: scale(1.08) translateZ(0) !important;
+}
+
+.wiki-card-image a:hover .progressive-state-error {
+  transform: scale(1.05) translateZ(0) !important;
+}
+
+/* 额外的性能优化 */
+@media (prefers-reduced-motion: reduce) {
+  .progressive-image-premium {
+    transition: opacity 200ms ease !important;
+  }
+  
+  .progressive-image-premium * {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* 高刷新率显示器优化 */
+@media (min-resolution: 120dpi) {
+  .progressive-image-premium {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: smooth;
+  }
+}
+
+/* Placeholder hover effect when no image */
 .wiki-card-image a:hover .bg-gray-200 {
   background-color: #d1d5db;
 }
 
-/* 增强毛玻璃卡片内容区域 */
+/* Enhanced glass card content area */
 .wiki-card-content {
-  padding: 28px; /* 从24px增加到28px，让内容区域更舒适 */
+  padding: 28px; /* Increase spacing for better readability */
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(25px) saturate(180%) brightness(115%);
   border-top: 0.5px solid rgba(255, 255, 255, 0.3);
@@ -123,7 +286,7 @@
   font-size: 18px;
   font-weight: 600;
   color: #1e293b;
-  margin-bottom: 16px; /* 从14px增加到16px */
+  margin-bottom: 16px; /* Slightly larger spacing */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -141,7 +304,7 @@
 .wiki-card-excerpt {
   font-size: 15px;
   color: #475569;
-  line-height: 1.7; /* 从1.6增加到1.7，让行间距更舒适 */
+  line-height: 1.7; /* Comfortable line height */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -150,7 +313,7 @@
   text-shadow: 0 1px 2px rgba(71, 85, 105, 0.05);
 }
 
-/* 卡片互动区域 */
+/* Card action area */
 .wiki-card-actions {
   display: flex;
   justify-content: space-between;

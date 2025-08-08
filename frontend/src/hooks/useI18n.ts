@@ -6,22 +6,22 @@ type TranslationKey = string;
 export function useI18n() {
   const [currentLocale] = useState<string>(() => {
     const saved = localStorage.getItem('locale');
-    // 只允许英文，其他语言都强制为英文
+    // UI strings are English-only for now
     if (saved && saved !== 'en') {
       localStorage.setItem('locale', 'en');
       return 'en';
     }
-    return 'en'; // 默认始终为英文
+    return 'en';
   });
 
   useEffect(() => {
-    // 确保始终保存为英文
+    // Always persist as English for UI strings
     localStorage.setItem('locale', 'en');
   }, [currentLocale]);
 
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
-    // 始终使用英文翻译
+    // Always use English translations
     let value: any = enTranslations;
     
     for (const k of keys) {
@@ -32,14 +32,14 @@ export function useI18n() {
   };
 
   const setLocale = (_locale: string) => {
-    // 忽略任何语言切换请求，始终保持英文
+    // No-op; UI language is locked to English for now
     console.log('Interface language is locked to English');
   };
 
   return {
     t,
-    currentLocale: 'en', // 始终返回英文
+    currentLocale: 'en',
     setLocale,
-    availableLocales: ['en'], // 只提供英文选项
+    availableLocales: ['en'],
   };
 }

@@ -13,9 +13,9 @@ html, body {
   scrollbar-width: none;
 }
 
-/* 柔和质感渐变背景 */
+/* Soft textured gradient background */
 .gradient-bg {
-  /* 使用Apple设计系统的优雅渐变 */
+  /* Elegant gradient inspired by Apple HIG */
   background: 
     linear-gradient(135deg, 
       #f8fafc 0%, 
@@ -34,10 +34,10 @@ html, body {
     );
   min-height: 100vh;
   position: relative;
-  /* 移除 overflow-x: hidden; 以避免影响下拉菜单 */
+  /* Do not use overflow-x: hidden to avoid dropdown issues */
 }
 
-/* 微妙的噪点纹理 - Apple风格 */
+/* Subtle noise texture (Apple-like) */
 .gradient-bg::before {
   content: '';
   position: absolute;
@@ -52,7 +52,7 @@ html, body {
   opacity: 0.3;
 }
 
-/* 呼吸式光晕 - Microsoft Fluent风格 */
+/* Breathing glow (Microsoft Fluent-like) */
 .gradient-bg::after {
   /* content: ''; */
   position: absolute;
@@ -69,7 +69,7 @@ html, body {
   will-change: opacity;
 }
 
-/* 真正的macOS毛玻璃效果 */
+/* Realistic macOS glassmorphism effect */
 .glass-effect {
   background: rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(40px) saturate(180%) brightness(110%);
@@ -79,7 +79,7 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-/* 弹窗毛玻璃卡片 - 性能优化版本 */
+/* Modal glass card with performance tweaks */
 .modern-card {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px) saturate(140%);
@@ -87,12 +87,12 @@ html, body {
   box-shadow: 
     0 10px 30px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  /* 性能优化 */
+  /* Performance hints */
   will-change: auto;
   transform: translateZ(0);
 }
 
-/* 按钮专用毛玻璃 */
+/* Glass style for buttons */
 .button-glass {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(30px) saturate(180%);
@@ -110,13 +110,13 @@ html, body {
     inset 0 0.5px 0 rgba(255, 255, 255, 0.6);
 }
 
-/* 浅色背景下的文字阴影 */
+/* Subtle text glow on light background */
 .text-glow {
   text-shadow: 0 2px 8px rgba(71, 85, 105, 0.15);
   color: #1e293b;
 }
 
-/* 高性能淡入动画 */
+/* High-performance fade-in animation */
 .fade-in {
   animation: fadeIn 0.15s ease-out forwards;
   will-change: opacity;
@@ -131,7 +131,7 @@ html, body {
   }
 }
 
-/* 微妙的呼吸光晕动画 */
+/* Subtle breathing glow animation */
 @keyframes subtleGlow {
   0%, 100% { 
     opacity: 0.5;
@@ -143,7 +143,7 @@ html, body {
   }
 }
 
-/* 高级毛玻璃按钮 - 参考iOS风格 */
+/* Advanced glass button (iOS-inspired) */
 .glass-button {
   background: 
     linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
@@ -157,7 +157,7 @@ html, body {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   overflow: hidden;
-  border-radius: 50%; /* 确保按钮为圆形 */
+  border-radius: 50%; /* Enforce circular shape */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -217,7 +217,7 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-/* 分享按钮的特殊状态 */
+/* Special state for share button */
 .glass-button.share-active {
   background: 
     linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(59, 130, 246, 0.3)),
@@ -238,9 +238,9 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-/* 自适应对比度按钮 - 确保在任何背景下都可见 */
+/* Adaptive contrast button for visibility across backgrounds */
 .adaptive-button {
-  /* 双重背景技术 */
+  /* Dual-background technique */
   background: 
     linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
     linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9));
@@ -264,7 +264,7 @@ html, body {
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-/* 现代设计感按钮组样式 */
+/* Modern button group style */
 .modern-button-group {
   position: relative;
   overflow: hidden;
@@ -292,7 +292,7 @@ html, body {
   opacity: 1;
 }
 
-/* 按钮指示器动画 */
+/* Button indicator animation */
 .button-indicator {
   position: relative;
   overflow: hidden;
@@ -317,7 +317,7 @@ html, body {
   height: 200%;
 }
 
-/* 性能优化 - 启用硬件加速 */
+/* Performance optimization - GPU hint */
 .modern-card,
 .glass-effect,
 .wiki-card {
@@ -331,7 +331,7 @@ html, body {
   will-change: auto;
 }
 
-/* 骨架屏动画 */
+/* Skeleton shimmer animation */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -345,7 +345,7 @@ html, body {
   animation: shimmer 2.5s ease-in-out infinite;
 }
 
-/* 脉冲动画优化 - 更柔和的动画 */
+/* Softer pulse animation */
 .animate-pulse {
   animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

@@ -7,13 +7,13 @@ export function useScrollPosition(threshold: number = 10) {
   const containerRef = useRef<HTMLElement | Window | null>(null);
 
   useEffect(() => {
-    // 查找滚动容器 - 优先查找有 overflow-y-scroll 的容器
+    // Find scroll container - prefer container with class containing overflow-y-scroll
     const findScrollContainer = (): HTMLElement | Window => {
       const containers = document.querySelectorAll('[class*="overflow-y-scroll"]');
       if (containers.length > 0) {
         return containers[0] as HTMLElement;
       }
-      // 如果没有找到，回退到 window
+      // Fallback to window if no container is found
       return window;
     };
 
@@ -36,10 +36,10 @@ export function useScrollPosition(threshold: number = 10) {
       }
     }, 100);
 
-    // 初始检查
+    // Initial check
     handleScroll();
 
-    // 添加滚动监听
+    // Add scroll listener
     if (containerRef.current) {
       containerRef.current.addEventListener('scroll', handleScroll, { passive: true });
     }

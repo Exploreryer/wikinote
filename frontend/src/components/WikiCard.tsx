@@ -4,13 +4,15 @@ import { useLikedArticles } from '../contexts/LikedArticlesContext';
 import { useI18n } from '../hooks/useI18n';
 import type { ArticleProps } from '../types/ArticleProps';
 import '../styles/WikiCard.css';
+import { useToast } from '../contexts/ToastContext';
+import { ProgressiveImage } from './ProgressiveImage';
 
 export function WikiCard({ article }: ArticleProps) {
-    const [imageLoaded, setImageLoaded] = useState(false);
     const [shareError, setShareError] = useState(false);
     const [shareSuccess, setShareSuccess] = useState(false);
     const { toggleLike, isLiked } = useLikedArticles();
     const { t } = useI18n();
+    const { showToast } = useToast();
 
     const handleShare = async () => {
         setShareError(false);
@@ -37,15 +39,7 @@ export function WikiCard({ article }: ArticleProps) {
                 await navigator.clipboard.writeText(article.url);
                 setShareSuccess(true);
                 setTimeout(() => setShareSuccess(false), 2000);
-                // Use better notification method
-                const notification = document.createElement('div');
-                notification.textContent = t('common.copied');
-                notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 2000);
+                showToast(t('common.copied'));
             } catch (error) {
                 console.error('Error copying to clipboard:', error);
                 setShareError(true);
@@ -65,15 +59,16 @@ export function WikiCard({ article }: ArticleProps) {
                     title={`Read more about ${article.displaytitle}`}
                 >
                     {article.thumbnail ? (
-                        <img
-                            loading="lazy"
+                        <ProgressiveImage
                             src={article.thumbnail.source}
                             alt={article.displaytitle}
-                            className={`${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300`}
-                            onLoad={() => setImageLoaded(true)}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            sizes="(max-width: 640px) 100vw, 33vw"
+                            onLoad={() => {
+                                // Image loaded successfully
+                            }}
                             onError={(e) => {
                                 console.error('Image failed to load:', e);
-                                setImageLoaded(true);
                             }}
                         />
                     ) : (

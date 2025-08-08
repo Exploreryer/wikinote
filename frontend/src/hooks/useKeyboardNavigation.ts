@@ -23,7 +23,7 @@ export function useKeyboardNavigation({
     (event: KeyboardEvent) => {
       if (!enabled) return;
 
-      // 如果焦点在输入框内，跳过某些快捷键
+      // Skip certain shortcuts if focus is inside an input field
       const target = event.target as HTMLElement;
       const isInInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
 

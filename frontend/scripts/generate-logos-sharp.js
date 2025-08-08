@@ -9,7 +9,7 @@ import { existsSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// 检查是否安装了Sharp
+// Check if sharp is installed
 async function checkSharp() {
   try {
     const sharp = await import('sharp');
@@ -19,11 +19,11 @@ async function checkSharp() {
   }
 }
 
-// 生成不同尺寸的PNG图标
+// Generate PNG icons in different sizes
 async function generatePNGIcons() {
   const sharp = await checkSharp();
   if (!sharp) {
-    console.error('❌ 未检测到Sharp库，请先安装: npm install sharp');
+    console.error('❌ Sharp is not installed. Please install first: npm install sharp');
     return false;
   }
 
@@ -32,7 +32,7 @@ async function generatePNGIcons() {
   const extensionIconsDir = resolve(__dirname, '../dist/extension/icons');
   
   if (!existsSync(sourceLogo)) {
-    console.error('❌ Logo文件不存在:', sourceLogo);
+    console.error('❌ Logo file does not exist:', sourceLogo);
     return false;
   }
 
@@ -49,18 +49,18 @@ async function generatePNGIcons() {
     { name: 'icon-512x512.png', size: 512, dest: extensionIconsDir },
   ];
 
-  console.log('🎨 开始生成PNG图标...');
+  console.log('🎨 Generating PNG icons...');
 
   for (const icon of iconSizes) {
     try {
-      // 确保目标目录存在
+      // Ensure destination directory exists
       if (!existsSync(icon.dest)) {
         await mkdir(icon.dest, { recursive: true });
       }
 
       const destPath = resolve(icon.dest, icon.name);
       
-      // 使用Sharp生成图标
+      // Generate icon with sharp
       await sharp.default(sourceLogo)
         .resize(icon.size, icon.size, {
           fit: 'contain',
@@ -69,16 +69,16 @@ async function generatePNGIcons() {
         .png()
         .toFile(destPath);
       
-      console.log(`✅ 生成: ${icon.name} (${icon.size}x${icon.size})`);
+      console.log(`✅ Generated: ${icon.name} (${icon.size}x${icon.size})`);
     } catch (error) {
-      console.error(`❌ 生成失败 ${icon.name}:`, error.message);
+      console.error(`❌ Failed to generate ${icon.name}:`, error.message);
     }
   }
 
   return true;
 }
 
-// 生成ICO文件（简化版本，使用PNG替代）
+// Generate ICO (simplified: use PNG instead)
 async function generateICO() {
   const sharp = await checkSharp();
   if (!sharp) return false;
@@ -87,7 +87,7 @@ async function generateICO() {
   const destICO = resolve(__dirname, '../public/favicon.ico');
   
   try {
-    // 由于ICO格式复杂，我们先生成一个16x16的PNG作为favicon
+    // ICO is complex; generate a 16x16 PNG as favicon instead
     await sharp.default(sourceLogo)
       .resize(16, 16, {
         fit: 'contain',
@@ -96,15 +96,15 @@ async function generateICO() {
       .png()
       .toFile(destICO.replace('.ico', '-16x16.png'));
     
-    console.log('✅ 生成: favicon-16x16.png (替代ICO)');
+    console.log('✅ Generated: favicon-16x16.png (ICO alternative)');
     return true;
   } catch (error) {
-    console.error('❌ 生成ICO失败:', error.message);
+    console.error('❌ Failed to generate ICO:', error.message);
     return false;
   }
 }
 
-// 生成SVG文件（简化版本）
+// Generate SVG (simplified)
 async function generateSVG() {
   const sharp = await checkSharp();
   if (!sharp) return false;
@@ -113,7 +113,7 @@ async function generateSVG() {
   const destSVG = resolve(__dirname, '../public/favicon.svg');
   
   try {
-    // 创建一个简单的SVG占位符
+    // Create a simple SVG placeholder
     const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <image href="data:image/png;base64,${await getBase64Image(sourceLogo)}" width="64" height="64"/>
 </svg>`;
@@ -121,22 +121,22 @@ async function generateSVG() {
     const fs = await import('fs/promises');
     await fs.writeFile(destSVG, svgContent);
     
-    console.log('✅ 生成: favicon.svg');
+    console.log('✅ Generated: favicon.svg');
     return true;
   } catch (error) {
-    console.error('❌ 生成SVG失败:', error.message);
+    console.error('❌ Failed to generate SVG:', error.message);
     return false;
   }
 }
 
-// 获取图片的base64编码
+// Read image as base64
 async function getBase64Image(imagePath) {
   const fs = await import('fs/promises');
   const buffer = await fs.readFile(imagePath);
   return buffer.toString('base64');
 }
 
-// 备份现有文件
+// Backup existing files
 async function backupExistingFiles() {
   const publicDir = resolve(__dirname, '../public');
   const backupDir = resolve(__dirname, '../assets/logo/backup');
@@ -161,41 +161,41 @@ async function backupExistingFiles() {
       
       if (existsSync(sourcePath)) {
         await copyFile(sourcePath, backupPath);
-        console.log(`📦 备份: ${file}`);
+        console.log(`📦 Backup: ${file}`);
       }
     }
 
-    console.log('✅ 现有文件已备份到 assets/logo/backup/');
+    console.log('✅ Existing files have been backed up to assets/logo/backup/');
   } catch (error) {
-    console.error('❌ 备份失败:', error.message);
+    console.error('❌ Backup failed:', error.message);
   }
 }
 
-// 主函数
+// Main entry
 async function generateLogos() {
-  console.log('🚀 开始批量处理Logo...');
+  console.log('🚀 Start logo batch processing...');
   
   try {
-    // 备份现有文件
+    // Backup existing files
     await backupExistingFiles();
     
-    // 生成PNG图标
+    // Generate PNG icons
     await generatePNGIcons();
     
-    // 生成ICO文件
+    // Generate ICO file
     await generateICO();
     
-    // 生成SVG文件
+    // Generate SVG file
     await generateSVG();
     
-    console.log('\n🎉 Logo批量处理完成！');
-    console.log('📁 生成的文件位置:');
-    console.log('   - Web图标: frontend/public/');
-    console.log('   - 扩展图标: frontend/dist/extension/icons/');
-    console.log('   - 备份文件: frontend/assets/logo/backup/');
+    console.log('\n🎉 Logo batch processing complete!');
+    console.log('📁 Outputs:');
+    console.log('   - Web icons: frontend/public/');
+    console.log('   - Extension icons: frontend/dist/extension/icons/');
+    console.log('   - Backup: frontend/assets/logo/backup/');
     
   } catch (error) {
-    console.error('❌ 处理失败:', error.message);
+    console.error('❌ Processing failed:', error.message);
   }
 }
 

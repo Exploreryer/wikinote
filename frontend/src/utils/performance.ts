@@ -1,4 +1,4 @@
-// 节流函数
+// Throttle function
 export function throttle<T extends (...args: any[]) => void>(
   func: T,
   delay: number
@@ -24,7 +24,7 @@ export function throttle<T extends (...args: any[]) => void>(
   }) as T;
 }
 
-// 防抖函数
+// Debounce function
 export function debounce<T extends (...args: any[]) => void>(
   func: T,
   delay: number
@@ -37,15 +37,15 @@ export function debounce<T extends (...args: any[]) => void>(
   }) as T;
 }
 
-// 图片预加载工具
+// Single image preload helper
 export const preloadImage = (src: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     
-    // 添加超时处理
+    // Add timeout guard (more forgiving for slow networks)
     const timeout = setTimeout(() => {
       reject(new Error('Image load timeout'));
-    }, 10000);
+    }, 20000);
     
     img.onload = () => {
       clearTimeout(timeout);
@@ -61,7 +61,7 @@ export const preloadImage = (src: string): Promise<void> => {
   });
 };
 
-// 批量图片预加载
+// Batch image preload
 export const preloadImages = async (sources: string[]): Promise<void[]> => {
   const promises = sources.map(src => 
     preloadImage(src).catch(error => {
@@ -73,7 +73,7 @@ export const preloadImages = async (sources: string[]): Promise<void[]> => {
   return Promise.allSettled(promises).then(() => []);
 };
 
-// 懒加载观察器
+// Lazy load observer
 export const createLazyLoadObserver = (
   callback: (entries: IntersectionObserverEntry[]) => void,
   options: IntersectionObserverInit = {}
@@ -87,7 +87,7 @@ export const createLazyLoadObserver = (
   return new IntersectionObserver(callback, defaultOptions);
 };
 
-// 重试机制
+// Retry helper with exponential backoff
 export const retry = async <T>(
   fn: () => Promise<T>,
   maxAttempts: number = 3,
@@ -105,7 +105,7 @@ export const retry = async <T>(
         throw lastError;
       }
       
-      // 指数退避延迟
+      // Exponential backoff delay
       await new Promise(resolve => 
         setTimeout(resolve, delay * Math.pow(2, attempt - 1))
       );

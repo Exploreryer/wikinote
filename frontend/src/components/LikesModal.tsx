@@ -3,6 +3,8 @@ import { X, Download, Search, Heart } from 'lucide-react';
 import { useLikedArticles } from '../contexts/LikedArticlesContext';
 import { useI18n } from '../hooks/useI18n';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRef } from 'react';
 
 interface LikesModalProps {
   isOpen: boolean;
@@ -18,6 +20,9 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
     onEscape: onClose,
     enabled: isOpen,
   });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(isOpen, containerRef);
 
   if (!isOpen) return null;
 
@@ -48,9 +53,9 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-      <div className="modern-card z-[41] p-6 rounded-2xl w-full max-w-2xl h-[80vh] flex flex-col relative fade-in">
-        {/* 头部区域 */}
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in" role="dialog" aria-modal="true">
+      <div className="modern-card z-[41] p-6 rounded-2xl w-full max-w-2xl h-[80vh] flex flex-col relative fade-in" role="document" ref={containerRef}>
+        {/* Header area */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-500 rounded-xl flex items-center justify-center">
@@ -68,7 +73,7 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
           
           <div className="flex items-center gap-2">
             {likedArticles.length > 0 && (
-              <button
+            <button
                 onClick={handleExport}
                 className="flex items-center gap-2 px-4 py-2 text-sm button-glass rounded-xl transition-all duration-300 hover:scale-105 text-slate-700 hover:text-slate-800"
                 title={t('likes.export')}
@@ -81,13 +86,14 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
               onClick={onClose}
               className="w-8 h-8 rounded-full button-glass flex items-center justify-center transition-all duration-300 text-slate-500 hover:text-slate-700"
               aria-label={t('common.close')}
+              autoFocus
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* 搜索区域 */}
+        {/* Search area */}
         <div className="relative mb-6">
           <input
             type="text"
@@ -99,7 +105,7 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
           <Search className="w-5 h-5 text-slate-500 absolute left-4 top-1/2 transform -translate-y-1/2" />
         </div>
 
-        {/* 内容区域 */}
+        {/* Content area */}
         <div className="flex-1 overflow-y-auto min-h-0">
           {filteredLikedArticles.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
@@ -117,7 +123,7 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
             <div className="space-y-3">
               {filteredLikedArticles.map((article) => (
                 <div
-                  key={`${article.pageid}-${Date.now()}`}
+                  key={article.pageid}
                   className="group p-4 rounded-xl glass-effect hover:bg-white/60 transition-all duration-300 border border-white/20"
                 >
                   <div className="flex gap-4 items-start">
@@ -167,6 +173,8 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
         className="w-full h-full z-[40] fixed inset-0"
         onClick={onClose}
         aria-label={t('common.close')}
+        role="button"
+        tabIndex={-1}
       ></div>
     </div>
   );

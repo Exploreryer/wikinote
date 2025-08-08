@@ -29,12 +29,12 @@ async function copyIcons() {
   const iconsDest = resolve(__dirname, '../dist/extension/icons');
   
   try {
-    // 确保icons目录存在
+    // Ensure icons directory exists
     if (!existsSync(iconsDest)) {
       await mkdir(iconsDest, { recursive: true });
     }
     
-    // 复制图标文件，使用对应尺寸的图标
+    // Copy icon files with expected sizes
     const iconMappings = [
       { src: 'favicon-16x16.png', dest: 'icon-16.png' },
       { src: 'favicon-32x32.png', dest: 'icon-32.png' },
@@ -54,6 +54,37 @@ async function copyIcons() {
         console.log(`🎨 Icon copied: ${srcFile} -> ${destFile}`);
       }
     }
+
+    // Ensure required sizes for manifest exist (16/32/48/128)
+    const requiredSizes = [16, 32, 48, 128];
+    const missingSizes = requiredSizes.filter((size) => !existsSync(resolve(iconsDest, `icon-${size}.png`)));
+
+    if (missingSizes.length > 0) {
+      try {
+        const sharp = (await import('sharp')).default;
+        // Prefer 512x512 as source
+        const source512 = resolve(iconsSrc, 'web-app-manifest-512x512.png');
+        const fallback192 = resolve(iconsSrc, 'web-app-manifest-192x192.png');
+        const sourcePath = existsSync(source512) ? source512 : fallback192;
+        if (!existsSync(sourcePath)) {
+          throw new Error('No suitable source image found to generate icons');
+        }
+
+        for (const size of missingSizes) {
+          const out = resolve(iconsDest, `icon-${size}.png`);
+          await sharp(sourcePath)
+            .resize(size, size, {
+              fit: 'contain',
+              background: { r: 0, g: 0, b: 0, alpha: 0 },
+            })
+            .png()
+            .toFile(out);
+          console.log(`🧩 Icon generated: icon-${size}.png`);
+        }
+      } catch (err) {
+        console.warn('⚠️ Unable to generate missing icons automatically:', err.message);
+      }
+    }
   } catch (error) {
     console.error('❌ Failed to copy icons:', error);
   }
@@ -63,7 +94,7 @@ async function copyBuiltFiles() {
   const targetDir = resolve(__dirname, '../dist/extension');
   
   try {
-    // 查找构建的文件 - Vite输出到相对路径
+    // Locate built files - Vite output path can vary based on config
     const possibleSourceDirs = [
       resolve(__dirname, '../dist/extension/configs/extension'),
       resolve(__dirname, '../../dist/extension/configs/extension'),
@@ -89,14 +120,14 @@ async function copyBuiltFiles() {
     
     console.log(`📁 Found built files in: ${sourceDir}`);
     
-    // 复制HTML文件
+    // Copy HTML file
     const htmlSrc = resolve(sourceDir, 'newtab.html');
     const htmlDest = resolve(targetDir, 'newtab.html');
     
     if (existsSync(htmlSrc)) {
       let htmlContent = await readFile(htmlSrc, 'utf8');
       
-      // 修复HTML文件中的路径
+      // Fix script path in HTML to point to built entry
       htmlContent = htmlContent.replace(
         'src="/src/main.tsx"',
         'src="./newtab.js"'
@@ -106,7 +137,7 @@ async function copyBuiltFiles() {
       console.log('📄 Copied and fixed: newtab.html');
     }
     
-    // 复制JS和CSS文件
+    // Copy JS and CSS files
     const files = await readdir(sourceDir);
     for (const file of files) {
       if (file.endsWith('.js') || file.endsWith('.css')) {
@@ -127,22 +158,22 @@ async function buildExtension() {
   console.log('🚀 Building Chrome Extension...');
   
   try {
-    // 确保目标目录存在
+    // Ensure target directory exists
     const targetDir = resolve(__dirname, '../dist/extension');
     if (!existsSync(targetDir)) {
       await mkdir(targetDir, { recursive: true });
     }
     
-    // 构建项目
+    // Run Vite build
     await build({
       configFile: extensionConfig,
       mode: 'production',
     });
     
-    // 复制构建的文件
+    // Copy built files
     await copyBuiltFiles();
     
-    // 复制必要的文件
+    // Copy required files
     await copyManifest();
     await copyIcons();
     

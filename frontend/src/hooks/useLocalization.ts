@@ -12,23 +12,32 @@ export function useLocalization() {
   }, []);
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(LANGUAGES[0]);
+  const [ready, setReady] = useState<boolean>(false);
 
-  // 初始化时从存储加载语言设置
+  // Initialize language from storage when mounted
   useEffect(() => {
+    let mounted = true;
     getInitialLanguage().then((lang) => {
+      if (!mounted) return;
       setCurrentLanguage(lang);
+      setReady(true);
     });
+    return () => { mounted = false; };
   }, [getInitialLanguage]);
 
   useEffect(() => {
+    // Persist language only after initial load to avoid overwriting saved value with default "en"
+    if (!ready) return;
     StorageAdapter.set("lang", currentLanguage.id);
-  }, [currentLanguage]);
+  }, [currentLanguage, ready]);
 
-  const setLanguage = (languageId: string) => {
+  const setLanguage = async (languageId: string) => {
     const newLanguage = LANGUAGES.find((lang) => lang.id === languageId);
     if (newLanguage) {
+      // Persist before reload to ensure it is available on next startup
+      await StorageAdapter.set("lang", newLanguage.id);
       setCurrentLanguage(newLanguage);
-      window.location.reload(); // 使用原始的正确方式
+      window.location.reload();
     } else {
       console.warn(`Language not found: ${languageId}`);
     }
@@ -38,5 +47,6 @@ export function useLocalization() {
     currentLanguage,
     setLanguage,
     availableLanguages: LANGUAGES,
+    ready,
   };
 }

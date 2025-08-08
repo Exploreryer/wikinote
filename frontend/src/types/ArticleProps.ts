@@ -1,4 +1,4 @@
-// 统一的文章相关类型定义
+// Unified article-related type definitions
 
 export interface WikiArticle {
   title: string;

@@ -5,20 +5,20 @@ import { useState, useEffect } from 'react';
 export function SkeletonCard() {
   return (
     <div className="wiki-card animate-pulse">
-      {/* 图片骨架 - 调整为50%高度 */}
+      {/* Image skeleton */}
       <div className="wiki-card-image bg-gradient-to-br from-gray-50 to-gray-100 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
       </div>
       
-      {/* 内容骨架 */}
+      {/* Content skeleton */}
       <div className="wiki-card-content">
-        {/* 标题骨架 */}
+        {/* Title skeleton */}
         <div className="space-y-2 mb-4">
           <div className="h-5 bg-gray-50 rounded animate-pulse"></div>
           <div className="h-5 bg-gray-50 rounded w-3/4 animate-pulse"></div>
         </div>
         
-        {/* 描述骨架 */}
+        {/* Description skeleton */}
         <div className="space-y-2">
           <div className="h-4 bg-gray-50 rounded animate-pulse"></div>
           <div className="h-4 bg-gray-50 rounded animate-pulse"></div>
@@ -30,7 +30,7 @@ export function SkeletonCard() {
 }
 
 export function SkeletonGrid({ count = 8 }: { count?: number }) {
-  // 直接渲染骨架屏卡片，使用父容器的网格布局
+  // Render a list of skeleton cards using parent's grid layout
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
@@ -40,7 +40,7 @@ export function SkeletonGrid({ count = 8 }: { count?: number }) {
   );
 }
 
-// 加载更多时的骨架屏组件
+// Skeletons shown while loading more
 export function LoadingSkeletonCards() {
   const [skeletonCount, setSkeletonCount] = useState(4);
 
@@ -48,11 +48,11 @@ export function LoadingSkeletonCards() {
     const updateSkeletonCount = () => {
       const width = window.innerWidth;
       if (width >= 1200) {
-        setSkeletonCount(4); // 大屏幕4个
+        setSkeletonCount(4); // Large screens: 4
       } else if (width >= 768) {
-        setSkeletonCount(3); // 中等屏幕3个
+        setSkeletonCount(3); // Medium screens: 3
       } else {
-        setSkeletonCount(2); // 小屏幕2个
+        setSkeletonCount(2); // Small screens: 2
       }
     };
 

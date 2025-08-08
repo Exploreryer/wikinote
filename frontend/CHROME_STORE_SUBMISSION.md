@@ -6,7 +6,7 @@
 
 ### 文件位置
 - **插件目录**: `dist/extension/`
-- **压缩包**: `dist/wikinote-extension.zip` (1.5MB)
+- **压缩包**: `dist/wikinote-extension.zip`
 
 ### 插件特性
 - ✅ Manifest V3 兼容
@@ -109,7 +109,7 @@ The extension requests access to https://*.wikipedia.org/* to fetch random Wikip
 
 **理由**:
 ```
-The extension fetches content from Wikipedia's public API (https://*.wikipedia.org/w/api.php) to display random articles. This is necessary for the core functionality of showing Wikipedia content. The extension does not execute any remote JavaScript code - it only retrieves data through standard HTTP requests to Wikipedia's public API endpoints. No user data is transmitted or collected.
+The extension fetches content from Wikipedia's public API (https://*.wikipedia.org/w/api.php) to display random articles. This is required for core functionality. The extension does not execute any remote JavaScript code; it only retrieves data via HTTPS requests to Wikipedia endpoints. No user data is transmitted or collected.
 ```
 
 #### 单一用途说明：
@@ -189,7 +189,7 @@ https://github.com/Exploreryer/wikinote
 
 ## 技术规格
 
-### 插件结构：
+### 插件结构（构建输出）：
 ```
 extension/
 ├── manifest.json          # 插件配置文件
@@ -213,11 +213,21 @@ extension/
 ## 故障排除
 
 如果遇到审核问题：
-1. 检查manifest.json格式
-2. 验证所有图标文件存在
-3. 测试插件功能完整性
-4. 确保权限使用合理
-5. 提供详细的功能说明
+1. 检查 `manifest.json` 语法与权限说明
+2. 验证 `icons/` 下 16/32/48/128 图标是否存在（构建脚本会自动生成缺失尺寸）
+3. 测试功能完整性：新标签页替换、文章获取、点赞、分享、语言切换
+4. 确保 CSP 配置符合商店要求（已在 `manifest.json` 的 `content_security_policy.extension_pages` 配置）
+5. 附上数据使用与隐私说明（不收集用户数据，全部本地存储）
+
+### 打包发布
+
+构建完成后运行：
+
+```bash
+npm run pack:extension
+```
+
+会在 `dist/wikinote-extension.zip` 生成提交包（包含 `extension/` 全部内容）。
 
 ## 联系信息
 

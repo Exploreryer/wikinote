@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+// Avoid Node path usage to keep TS build simple
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,12 +11,12 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      manifest: {
+        manifest: {
         name: "Wikinote",
         short_name: "Wikinote",
         icons: [
           {
-            src: "/wiki-logo.svg",
+              src: "/favicon.svg",
             sizes: "any",
             type: "image/svg+xml",
           },
@@ -27,4 +28,12 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+  define: {
+    __IS_EXTENSION__: JSON.stringify(false),
+  },
 });

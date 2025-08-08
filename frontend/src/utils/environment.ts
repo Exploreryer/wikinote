@@ -1,6 +1,6 @@
-// 环境检测和适配工具
+// Environment detection and adaptation utilities
 
-// 声明全局变量
+// Global declarations
 declare global {
   var __IS_EXTENSION__: boolean | undefined;
   var chrome: any;
@@ -8,13 +8,20 @@ declare global {
 
 export const isExtension = typeof __IS_EXTENSION__ !== 'undefined' && __IS_EXTENSION__;
 
-// Chrome Storage API 适配
+// Chrome Storage API adapter
 export class StorageAdapter {
   static async get(key: string): Promise<any> {
     if (isExtension && typeof chrome !== 'undefined') {
       return new Promise((resolve) => {
         chrome.storage.local.get([key], (result: any) => {
-          resolve(result[key]);
+          const value = result[key];
+          if (typeof value === 'undefined' || value === null) {
+            // Fallback to localStorage mirror if any
+            const mirrored = localStorage.getItem(key);
+            resolve(mirrored ? JSON.parse(mirrored) : null);
+          } else {
+            resolve(value);
+          }
         });
       });
     } else {
@@ -26,7 +33,10 @@ export class StorageAdapter {
   static async set(key: string, value: any): Promise<void> {
     if (isExtension && typeof chrome !== 'undefined') {
       return new Promise((resolve) => {
-        chrome.storage.local.set({ [key]: value }, resolve);
+        chrome.storage.local.set({ [key]: value }, () => {
+          try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+          resolve();
+        });
       });
     } else {
       localStorage.setItem(key, JSON.stringify(value));
@@ -44,32 +54,24 @@ export class StorageAdapter {
   }
 }
 
-// Analytics 适配
+// Analytics adapter
 export const Analytics = {
   track: (event: string, properties?: any) => {
     if (!isExtension) {
-      // 只在Web环境下使用Vercel Analytics
+      // Use Vercel Analytics only on Web
       if (typeof window !== 'undefined' && (window as any).va) {
         (window as any).va(event, properties);
       }
     }
-    // Extension环境下可以集成其他分析服务或跳过
+    // In extension env either integrate other analytics or no-op
   }
 };
 
-// 网络请求适配
+// Fetch adapter with minimal CORS adjustments for extension
 export const fetchWithCORS = async (url: string, options?: RequestInit): Promise<Response> => {
   if (isExtension && typeof chrome !== 'undefined') {
-    // Extension环境下添加必要的headers
-    const modifiedOptions = {
-      ...options,
-      headers: {
-        ...options?.headers,
-        'Origin': chrome.runtime.getURL(''),
-      },
-    };
-    return fetch(url, modifiedOptions);
-  } else {
+    // In MV3 most requests work with origin=* query; avoid forcing Origin header
     return fetch(url, options);
   }
+  return fetch(url, options);
 }; 

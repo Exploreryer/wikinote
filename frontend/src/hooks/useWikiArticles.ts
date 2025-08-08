@@ -10,11 +10,12 @@ export function useWikiArticles() {
   const [loading, setLoading] = useState(false);
   const [buffer, setBuffer] = useState<WikiArticle[]>([]);
   const [error, setError] = useState<AppError | null>(null);
-  const { currentLanguage } = useLocalization();
+  const { currentLanguage, ready } = useLocalization();
   const { t } = useI18n();
 
   const fetchArticles = useCallback(async (forBuffer = false) => {
     if (loading) return;
+    if (!ready) return;
     setLoading(true);
     setError(null);
     
@@ -35,7 +36,9 @@ export function useWikiArticles() {
               exsentences: "5",
               explaintext: "1",
               piprop: "thumbnail",
-              pithumbsize: "800",
+              // Request a reasonable thumbnail size to balance clarity and speed
+              // We still provide a low-res first via srcset for faster paint.
+              pithumbsize: "480",
               origin: "*",
               variant: currentLanguage.id,
             })
@@ -73,7 +76,7 @@ export function useWikiArticles() {
             article.extract
         );
 
-      // 预加载图片，但不阻塞渲染
+      // Preload images without blocking rendering
       const imageSources = newArticles
         .filter(article => article.thumbnail)
         .map(article => article.thumbnail!.source);
@@ -84,7 +87,7 @@ export function useWikiArticles() {
         setBuffer(newArticles);
       } else {
         setArticles((prev) => [...prev, ...newArticles]);
-        // 不立即获取下一批，避免过度请求
+        // Do not fetch the next batch immediately to avoid overfetching
         setTimeout(() => fetchArticles(true), 1000);
       }
     } catch (fetchError) {
@@ -105,7 +108,7 @@ export function useWikiArticles() {
     } finally {
       setLoading(false);
     }
-  }, [currentLanguage, t, loading]);
+  }, [currentLanguage, t, loading, ready]);
 
   const getMoreArticles = useCallback(() => {
     if (buffer.length > 0) {

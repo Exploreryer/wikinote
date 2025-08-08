@@ -10,12 +10,12 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      manifest: {
+        manifest: {
         name: "Wikinote",
         short_name: "Wikinote",
         icons: [
           {
-            src: "/wiki-logo.svg",
+              src: "/favicon.svg",
             sizes: "any",
             type: "image/svg+xml",
           },
@@ -43,4 +43,6 @@ export default defineConfig({
       "@": resolve(__dirname, "../../src"),
     },
   },
+  // Use the same static assets source as dev/extension
+  publicDir: resolve(__dirname, "../../public"),
 }); 

@@ -10,7 +10,7 @@ export function LikedArticlesProvider({ children }: { children: ReactNode }) {
     const [likedArticles, setLikedArticles] = useState<WikiArticle[]>([]);
     const [showHeart, setShowHeart] = useState(false);
 
-    // 初始化时从存储加载数据
+    // Initialize liked articles from storage on mount
     useEffect(() => {
         StorageAdapter.get("likedArticles").then((saved) => {
             if (saved) {
@@ -19,11 +19,9 @@ export function LikedArticlesProvider({ children }: { children: ReactNode }) {
         });
     }, []);
 
-    // 当数据变化时保存到存储
+    // Persist liked articles whenever it changes
     useEffect(() => {
-        if (likedArticles.length > 0 || likedArticles.length === 0) {
-            StorageAdapter.set("likedArticles", likedArticles);
-        }
+        StorageAdapter.set("likedArticles", likedArticles);
     }, [likedArticles]);
 
     const toggleLike = (article: WikiArticle) => {

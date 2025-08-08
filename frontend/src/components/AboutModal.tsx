@@ -1,6 +1,8 @@
 import { X } from 'lucide-react';
 import { useI18n } from '../hooks/useI18n';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRef } from 'react';
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -15,15 +17,19 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
     enabled: isOpen,
   });
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(isOpen, containerRef);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-      <div className="modern-card z-[41] p-8 rounded-2xl max-w-md relative fade-in">
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in" role="dialog" aria-modal="true">
+      <div className="modern-card z-[41] p-8 rounded-2xl max-w-md relative fade-in" role="document" ref={containerRef}>
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-500 hover:text-slate-700 w-8 h-8 rounded-full button-glass flex items-center justify-center transition-all duration-300"
           aria-label={t('common.close')}
+          autoFocus
         >
           <X className="w-4 h-4" />
         </button>
@@ -88,6 +94,8 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
         className="w-full h-full z-[40] fixed inset-0"
         onClick={onClose}
         aria-label={t('common.close')}
+        role="button"
+        tabIndex={-1}
       ></div>
     </div>
   );

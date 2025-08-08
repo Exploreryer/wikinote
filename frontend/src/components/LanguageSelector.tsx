@@ -10,46 +10,19 @@ export function LanguageSelector() {
   const { t } = useI18n();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 预加载并缓存所有国旗图片为Base64
-  useEffect(() => {
-    const cacheImages = async () => {
-      const imageCache: Record<string, string> = {};
-      
-             const loadImageAsBase64 = (url: string): Promise<string> => {
-         return new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx?.drawImage(img, 0, 0);
-            try {
-              const dataURL = canvas.toDataURL('image/svg+xml');
-              resolve(dataURL);
-            } catch (error) {
-              // 如果转换失败，使用原始URL
-              resolve(url);
-            }
-          };
-          img.onerror = () => resolve(url); // 失败时使用原始URL
-          img.src = url;
-        });
-      };
-
-      // 并行加载所有图片
-      const promises = LANGUAGES.map(async (language) => {
-        const base64 = await loadImageAsBase64(language.flag);
-        imageCache[language.id] = base64;
-      });
-
-      await Promise.all(promises);
-      setCachedImages(imageCache);
+  // Lazy cache flags on demand to avoid upfront heavy work
+  const ensureImageCached = (id: string, url: string) => {
+    if (cachedImages[id]) return;
+    const img = new Image();
+    img.onload = () => {
+      // Cache the original url after successful load
+      setCachedImages(prev => ({ ...prev, [id]: url }));
     };
-
-    cacheImages();
-  }, []);
+    img.onerror = () => {
+      // No-op; rendering will fallback to text avatar
+    };
+    img.src = url;
+  };
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -84,12 +57,14 @@ export function LanguageSelector() {
         onClick={handleButtonClick}
         style={{ position: 'relative', zIndex: 10000 }}
         data-testid="language-button"
+        aria-haspopup="listbox"
+        aria-expanded={showDropdown}
       >
         <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
         {t('app.language')}
       </button>
 
-      {/* 语言下拉菜单 */}
+      {/* Language dropdown */}
       {showDropdown && (
         <div 
           className="absolute bg-white/95 backdrop-blur-2xl rounded-xl shadow-xl border border-white/40"
@@ -107,6 +82,7 @@ export function LanguageSelector() {
             willChange: 'transform'
           }}
           data-testid="language-dropdown"
+          role="listbox"
         >
           <div className="p-3 border-b border-white/20">
             <div className="text-sm font-medium text-gray-800">Select Wikipedia Language</div>
@@ -116,16 +92,17 @@ export function LanguageSelector() {
             className="max-h-80 overflow-y-auto p-2" 
             style={{ scrollBehavior: 'smooth' }}
           >
-            {LANGUAGES.map((language) => (
+             {LANGUAGES.map((language) => (
               <button
                 key={language.id}
-                onClick={(e) => {
+                 onClick={async (e) => {
                   e.stopPropagation();
-                  setLanguage(language.id);
-                  setShowDropdown(false);
+                   await setLanguage(language.id);
+                   setShowDropdown(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/20 rounded-lg transition-all duration-200 text-left"
                 title={`Switch to ${language.name}`}
+                role="option"
               >
                 <div className="w-5 h-5 rounded-full flex-shrink-0 bg-white/30 backdrop-blur-sm flex items-center justify-center">
                   <img 
@@ -137,6 +114,8 @@ export function LanguageSelector() {
                       minHeight: '20px',
                       backgroundColor: 'transparent'
                     }}
+                    loading="lazy"
+                    ref={() => ensureImageCached(language.id, language.flag)}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
