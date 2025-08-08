@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Wikinote",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Discover random Wikipedia articles on every new tab",
   "permissions": [
     "storage",
@@ -31,4 +31,4 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://*.wikipedia.org https://en.wikipedia.org https://upload.wikimedia.org; img-src 'self' data: https://*; style-src 'self' 'unsafe-inline' data:;"
   }
-} 
+}
