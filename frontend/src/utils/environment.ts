@@ -3,38 +3,58 @@
 // Global declarations
 declare global {
   var __IS_EXTENSION__: boolean | undefined;
-  var chrome: any;
+  var chrome:
+    | {
+        storage?: {
+          local: {
+            get: (
+              keys: string[],
+              cb: (result: Record<string, unknown>) => void
+            ) => void;
+            set: (
+              items: Record<string, unknown>,
+              cb: () => void
+            ) => void;
+            remove: (keys: string[], cb: () => void) => void;
+          };
+        };
+      }
+    | undefined;
 }
 
 export const isExtension = typeof __IS_EXTENSION__ !== 'undefined' && __IS_EXTENSION__;
 
 // Chrome Storage API adapter
 export class StorageAdapter {
-  static async get(key: string): Promise<any> {
+  static async get<T = unknown>(key: string): Promise<T | null> {
     if (isExtension && typeof chrome !== 'undefined') {
       return new Promise((resolve) => {
-        chrome.storage.local.get([key], (result: any) => {
-          const value = result[key];
+        chrome!.storage!.local.get([key], (result: Record<string, unknown>) => {
+          const value = result[key] as T | undefined;
           if (typeof value === 'undefined' || value === null) {
             // Fallback to localStorage mirror if any
             const mirrored = localStorage.getItem(key);
-            resolve(mirrored ? JSON.parse(mirrored) : null);
+            resolve(mirrored ? (JSON.parse(mirrored) as T) : null);
           } else {
-            resolve(value);
+            resolve(value ?? null);
           }
         });
       });
     } else {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
+      return item ? ((JSON.parse(item) as unknown) as T) : null;
     }
   }
 
-  static async set(key: string, value: any): Promise<void> {
+  static async set<T = unknown>(key: string, value: T): Promise<void> {
     if (isExtension && typeof chrome !== 'undefined') {
       return new Promise((resolve) => {
-        chrome.storage.local.set({ [key]: value }, () => {
-          try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+        chrome!.storage!.local.set({ [key]: value as unknown }, () => {
+          try {
+            localStorage.setItem(key, JSON.stringify(value));
+          } catch (err) {
+            console.warn('Failed to mirror to localStorage', err);
+          }
           resolve();
         });
       });
@@ -56,11 +76,16 @@ export class StorageAdapter {
 
 // Analytics adapter
 export const Analytics = {
-  track: (event: string, properties?: any) => {
+  track: (event: string, properties?: Record<string, unknown>) => {
     if (!isExtension) {
       // Use Vercel Analytics only on Web
-      if (typeof window !== 'undefined' && (window as any).va) {
-        (window as any).va(event, properties);
+      if (typeof window !== 'undefined') {
+        const w = window as unknown as {
+          va?: (e: string, p?: Record<string, unknown>) => void;
+        };
+        if (w.va) {
+          w.va(event, properties);
+        }
       }
     }
     // In extension env either integrate other analytics or no-op

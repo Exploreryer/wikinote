@@ -76,7 +76,7 @@ function App() {
     if (ready) {
       fetchArticles();
     }
-  }, [ready]);
+  }, [ready, fetchArticles]);
 
   return (
     <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll">

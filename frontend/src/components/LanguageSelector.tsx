@@ -103,6 +103,7 @@ export function LanguageSelector() {
                 className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/20 rounded-lg transition-all duration-200 text-left"
                 title={`Switch to ${language.name}`}
                 role="option"
+                aria-selected={false}
               >
                 <div className="w-5 h-5 rounded-full flex-shrink-0 bg-white/30 backdrop-blur-sm flex items-center justify-center">
                   <img 

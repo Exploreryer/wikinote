@@ -29,7 +29,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-500 hover:text-slate-700 w-8 h-8 rounded-full button-glass flex items-center justify-center transition-all duration-300"
           aria-label={t('common.close')}
-          autoFocus
+          // Avoid autoFocus for a11y; focus is handled by focus trap
         >
           <X className="w-4 h-4" />
         </button>
@@ -93,9 +93,11 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
       <div
         className="w-full h-full z-[40] fixed inset-0"
         onClick={onClose}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClose(); } }}
         aria-label={t('common.close')}
         role="button"
-        tabIndex={-1}
+        tabIndex={0}
+        aria-pressed="false"
       ></div>
     </div>
   );

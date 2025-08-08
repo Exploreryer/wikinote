@@ -75,7 +75,7 @@ export function useImagePreloader(
             await preloadImage(url);
             loadedCacheRef.current.add(url);
           } catch (error) {
-            console.debug('Failed to preload image:', url, error);
+            console.warn('Failed to preload image:', url, error);
           } finally {
             loadingQueueRef.current.delete(url);
           }
@@ -106,10 +106,12 @@ export function useImagePreloader(
 
   // Cleanup on unmount
   useEffect(() => {
+    const abortControllers = abortControllersRef.current;
+    const loadingQueue = loadingQueueRef.current;
     return () => {
-      abortControllersRef.current.forEach(controller => controller.abort());
-      abortControllersRef.current.clear();
-      loadingQueueRef.current.clear();
+      abortControllers.forEach(controller => controller.abort());
+      abortControllers.clear();
+      loadingQueue.clear();
     };
   }, []);
 

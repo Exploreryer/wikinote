@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AlertCircle, X, RefreshCw } from 'lucide-react';
 import { useI18n } from '../hooks/useI18n';
 import type { AppError } from '../types/ArticleProps';
@@ -29,12 +29,12 @@ export function ErrorNotification({
         return () => clearTimeout(timer);
       }
     }
-  }, [error, autoClose, duration]);
+  }, [error, autoClose, duration, handleClose]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsVisible(false);
     setTimeout(onClose, 300); // Wait for animation
-  };
+  }, [onClose]);
 
   if (!error) return null;
 

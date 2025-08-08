@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import type { WikiArticle, LikedArticlesContextType } from "../types/ArticleProps";
 import { Heart } from "lucide-react";
 import { StorageAdapter } from "../utils/environment";

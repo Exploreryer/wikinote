@@ -57,17 +57,26 @@ export function useWikiArticles() {
         throw new Error('Invalid API response');
       }
 
-      const newArticles = Object.values(data.query.pages)
-        .map(
-          (page: any): WikiArticle => ({
-            title: page.title,
-            displaytitle: page.varianttitles?.[currentLanguage.id] || page.title,
-            extract: page.extract,
-            pageid: page.pageid,
-            thumbnail: page.thumbnail,
-            url: page.canonicalurl,
-          })
-        )
+      type WikipediaThumbnail = { source: string; width: number; height: number };
+      type WikipediaPage = {
+        title: string;
+        varianttitles?: Record<string, string>;
+        extract: string;
+        pageid: number;
+        thumbnail?: WikipediaThumbnail;
+        canonicalurl: string;
+      };
+
+      const pages = data.query.pages as Record<string, WikipediaPage>;
+      const newArticles = Object.values(pages)
+        .map((page): WikiArticle => ({
+          title: page.title,
+          displaytitle: page.varianttitles?.[currentLanguage.id] || page.title,
+          extract: page.extract,
+          pageid: page.pageid,
+          thumbnail: page.thumbnail,
+          url: page.canonicalurl,
+        }))
         .filter(
           (article) =>
             article.thumbnail &&

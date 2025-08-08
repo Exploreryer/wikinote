@@ -86,7 +86,7 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
               onClick={onClose}
               className="w-8 h-8 rounded-full button-glass flex items-center justify-center transition-all duration-300 text-slate-500 hover:text-slate-700"
               aria-label={t('common.close')}
-              autoFocus
+              // Avoid autoFocus for a11y; focus is handled by focus trap
             >
               <X className="w-4 h-4" />
             </button>
@@ -140,11 +140,12 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2">
-                        <a
+                         <a
                           href={article.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-semibold text-slate-800 hover:text-blue-600 transition-colors line-clamp-1"
+                           onKeyDown={(e) => { if (e.key === 'Enter') { window.open(article.url, '_blank', 'noopener,noreferrer'); } }}
                         >
                           {article.title}
                         </a>
@@ -172,9 +173,11 @@ export function LikesModal({ isOpen, onClose }: LikesModalProps) {
       <div
         className="w-full h-full z-[40] fixed inset-0"
         onClick={onClose}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClose(); } }}
         aria-label={t('common.close')}
         role="button"
-        tabIndex={-1}
+        tabIndex={0}
+        aria-pressed="false"
       ></div>
     </div>
   );

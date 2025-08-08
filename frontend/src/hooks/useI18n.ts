@@ -22,18 +22,19 @@ export function useI18n() {
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
     // Always use English translations
-    let value: any = enTranslations;
+    let value: unknown = enTranslations;
     
     for (const k of keys) {
-      value = value?.[k];
+      value = (value as Record<string, unknown>)?.[k];
     }
     
     return typeof value === 'string' ? value : key;
   };
 
   const setLocale = (_locale: string) => {
+    void _locale; // mark as used to satisfy no-unused-vars
     // No-op; UI language is locked to English for now
-    console.log('Interface language is locked to English');
+    console.warn('Interface language is locked to English');
   };
 
   return {
