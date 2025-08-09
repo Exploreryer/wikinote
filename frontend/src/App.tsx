@@ -1,6 +1,8 @@
 import { Analytics } from "@vercel/analytics/react"
 import { Loader2 } from "lucide-react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useScroll } from "motion/react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useInfiniteQuery } from "@tanstack/react-query"
 import { AboutModal } from "./components/AboutModal"
 import { ErrorNotification } from "./components/ErrorNotification"
 import { LanguageSelector } from "./components/LanguageSelector"
@@ -12,21 +14,114 @@ import { LoadingSkeletonCards, SkeletonGrid } from "./components/SkeletonCard"
 import { useI18n } from "./hooks/useI18n"
 import { useImagePreloader } from "./hooks/useImagePreloader"
 import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation"
-import { useLocalization } from "./hooks/useLocalization"
 import { useScrollPosition } from "./hooks/useScrollPosition"
-import { useWikiArticles } from "./hooks/useWikiArticles"
-import { createLazyLoadObserver } from "./utils/performance"
+import type { AppError, WikiArticle } from "./types/ArticleProps"
+import { fetchWithCORS } from "./utils/environment"
+import { preloadImages } from "./utils/performance"
+import { useLocalization } from "./hooks/useLocalization"
 
 function App() {
   const [showAbout, setShowAbout] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
-  const { articles, loading, error, clearError, fetchArticles } = useWikiArticles()
-  const { ready } = useLocalization()
+  const { currentLanguage } = useLocalization()
+  const [errorDismissed, setErrorDismissed] = useState(false)
 
   const { t } = useI18n()
-  const observerTarget = useRef(null)
   const { scrollY, isScrolled } = useScrollPosition(30)
   const titleOpacity = Math.max(0, 1 - scrollY / 80)
+  const { scrollYProgress } = useScroll()
+
+  // Query function to fetch a batch of random Wikipedia articles
+  const queryFn = useMemo(() => {
+    return async (): Promise<WikiArticle[]> => {
+      const response = await fetchWithCORS(
+        currentLanguage.api +
+          new URLSearchParams({
+            action: "query",
+            format: "json",
+            generator: "random",
+            grnnamespace: "0",
+            prop: "extracts|info|pageimages",
+            inprop: "url|varianttitles",
+            grnlimit: "20",
+            exintro: "1",
+            exlimit: "max",
+            exsentences: "5",
+            explaintext: "1",
+            piprop: "thumbnail",
+            pithumbsize: "480",
+            origin: "*",
+            variant: currentLanguage.id,
+          })
+      )
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+      const data = await response.json()
+      if (!data.query || !data.query.pages) throw new Error("Invalid API response")
+
+      type WikipediaThumbnail = { source: string; width: number; height: number }
+      type WikipediaPage = {
+        title: string
+        varianttitles?: Record<string, string>
+        extract: string
+        pageid: number
+        thumbnail?: WikipediaThumbnail
+        canonicalurl: string
+      }
+
+      const pages = data.query.pages as Record<string, WikipediaPage>
+      const newArticles = Object.values(pages)
+        .map(
+          (page): WikiArticle => ({
+            title: page.title,
+            displaytitle: page.varianttitles?.[currentLanguage.id] || page.title,
+            extract: page.extract,
+            pageid: page.pageid,
+            thumbnail: page.thumbnail,
+            url: page.canonicalurl,
+          })
+        )
+        .filter((a) => a.thumbnail && a.thumbnail.source && a.url && a.extract)
+
+      const images = newArticles.filter((a) => a.thumbnail).map((a) => a.thumbnail!.source)
+      preloadImages(images).catch(console.warn)
+      return newArticles
+    }
+  }, [currentLanguage])
+
+  const {
+    data: queryData,
+    error: queryError,
+    refetch,
+    fetchNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isPending,
+  } = useInfiniteQuery({
+    queryKey: ["wikiArticles", currentLanguage.id],
+    queryFn: () => queryFn(),
+    initialPageParam: 0,
+    getNextPageParam: (_lastPage: WikiArticle[], allPages: WikiArticle[][]) => allPages.length,
+    enabled: false,
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
+
+  const flatArticles = (queryData?.pages ?? []).flat() as WikiArticle[]
+  const articles = flatArticles.length > 200 ? flatArticles.slice(flatArticles.length - 200) : flatArticles
+  const loading = isPending || isFetching || isFetchingNextPage
+  const error: AppError | null = useMemo(() => {
+    if (errorDismissed || !queryError) return null
+    return {
+      title: t("errors.fetchFailed"),
+      message: queryError instanceof Error ? queryError.message : t("errors.somethingWrong"),
+      action: { label: t("common.retry"), handler: () => refetch() },
+    }
+  }, [errorDismissed, queryError, refetch, t])
+  const clearError = () => setErrorDismissed(true)
+  const fetchArticles = useCallback(() => {
+    setErrorDismissed(false)
+    return queryData ? fetchNextPage() : refetch()
+  }, [fetchNextPage, queryData, refetch])
 
   // Preload images for better user experience
   const imageUrls = articles.filter((article) => article.thumbnail).map((article) => article.thumbnail!.source)
@@ -46,7 +141,7 @@ function App() {
     enabled: !showAbout && !showLikes, // Only enable when no modals are open
   })
 
-  // Keep latest loading/error in refs to avoid recreating observer callback
+  // Keep latest loading/error in refs to avoid stale closures
   const loadingRef = useRef(loading)
   const errorRef = useRef(error)
   useEffect(() => {
@@ -54,41 +149,30 @@ function App() {
     errorRef.current = error
   }, [loading, error])
 
-  const hasRequestedSinceVisibleRef = useRef(false)
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [target] = entries
-      if (target.isIntersecting) {
-        if (!hasRequestedSinceVisibleRef.current && !loadingRef.current && !errorRef.current) {
-          hasRequestedSinceVisibleRef.current = true
-          fetchArticles()
-        }
-      } else {
-        // Reset when sentinel leaves the viewport
-        hasRequestedSinceVisibleRef.current = false
-      }
-    },
-    [fetchArticles]
-  )
-
+  // Initial load if empty
   useEffect(() => {
-    const observer = createLazyLoadObserver(handleObserver, {
-      threshold: 0,
-      rootMargin: "0px",
-    })
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current)
-    }
-
-    return () => observer.disconnect()
-  }, [handleObserver])
-
-  useEffect(() => {
-    if (ready) {
+    if (articles.length === 0 && !loadingRef.current && !errorRef.current) {
       fetchArticles()
     }
-  }, [ready, fetchArticles])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Auto load next page when scrolled to 80% of the page height
+  const hasTriggeredRef = useRef(false)
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (p: number) => {
+      if (p >= 0.8) {
+        if (!hasTriggeredRef.current && !loadingRef.current && !errorRef.current) {
+          hasTriggeredRef.current = true
+          fetchArticles()
+        }
+      } else if (p < 0.7) {
+        // hysteresis to avoid rapid re-triggers around the threshold
+        hasTriggeredRef.current = false
+      }
+    })
+    return () => unsubscribe()
+  }, [fetchArticles, scrollYProgress])
 
   return (
     <div
@@ -171,8 +255,6 @@ function App() {
 
         {/* Initial loading skeleton - in the same container */}
         {articles.length === 0 && loading && <SkeletonGrid count={6} />}
-
-        <div ref={observerTarget} className="h-10 col-span-full" />
       </div>
 
       {/* Loading indicator when loading more */}
