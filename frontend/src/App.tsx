@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView, useScroll } from "motion/react"
 import { useEffect, useMemo, useRef } from "react"
-import { WikiCard } from "./components/WikiCard"
 import { LoadingSkeletonCards, SkeletonGrid } from "./components/SkeletonCard"
+import { WikiCard } from "./components/WikiCard"
 import { useLocalization } from "./hooks/useLocalization"
 import type { WikiArticle } from "./types/ArticleProps"
 import { fetchWithCORS } from "./utils/environment"
@@ -76,8 +76,7 @@ function App() {
     queryFn: () => queryFn(),
     initialPageParam: 0,
     getNextPageParam: (_lastPage: WikiArticle[], allPages: WikiArticle[][]) => allPages.length,
-    enabled: false,
-    retry: false,
+    retry: 2,
     refetchOnWindowFocus: false,
   })
 
@@ -95,14 +94,13 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadMoreDetectorInView])
 
-  const isInitialLoading = articles.length === 0 && loading
   return (
     <div className="masonry-grid">
       {articles.map((article, idx) => (
         <WikiCard key={article.pageid} article={article} priority={idx < 6} />
       ))}
-      {isInitialLoading && <SkeletonGrid count={6} />}
-      {loading && articles.length > 0 && <LoadingSkeletonCards />}
+      {isPending && <SkeletonGrid count={6} />}
+      {loading && <LoadingSkeletonCards />}
       <div ref={loadMoreDetectorRef} className="h-10 col-span-full" />
     </div>
   )
