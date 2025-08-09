@@ -1,14 +1,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
+import { Loader2 } from "lucide-react"
 import { useInView, useScroll } from "motion/react"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { AboutModal } from "./components/AboutModal"
+import { LanguageSelector } from "./components/LanguageSelector"
+import { LikesModal } from "./components/LikesModal"
 import { LoadingSkeletonCards, SkeletonGrid } from "./components/SkeletonCard"
 import { WikiCard } from "./components/WikiCard"
-import { AboutModal } from "./components/AboutModal"
-import { LikesModal } from "./components/LikesModal"
-import { LanguageSelector } from "./components/LanguageSelector"
-import { Loader2 } from "lucide-react"
-import { useLocalization } from "./hooks/useLocalization"
 import { useI18n } from "./hooks/useI18n"
+import { useLocalization } from "./hooks/useLocalization"
+import { useScrollPosition } from "./hooks/useScrollPosition"
 import type { WikiArticle } from "./types/ArticleProps"
 import { fetchWithCORS } from "./utils/environment"
 
@@ -18,6 +19,8 @@ function App() {
   const { currentLanguage } = useLocalization()
   useScroll() // ensure motion scroll values are initialized (not used directly)
   const { t } = useI18n()
+  const { scrollY } = useScrollPosition(30)
+  const titleOpacity = Math.max(0, 1 - scrollY / 80)
 
   // Query function to fetch a batch of random Wikipedia articles
   const queryFn = useMemo(() => {
@@ -104,6 +107,22 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
+      {/* Top-left brand */}
+      <div className="fixed top-4 left-4 z-50">
+        <button
+          onClick={() => window.location.reload()}
+          className={`text-2xl font-bold text-glow hover:opacity-90 transition-all duration-300 px-2 py-1 hover:scale-105 text-slate-800 ${
+            titleOpacity === 0 ? "pointer-events-none" : ""
+          }`}
+          style={{
+            opacity: titleOpacity,
+            transform: `translateY(${titleOpacity === 0 ? "-10px" : "0"})`,
+            transition: "all 0.3s ease-in-out",
+          }}
+        >
+          {t("app.title")}
+        </button>
+      </div>
       {/* Top-right controls */}
       <div className="fixed top-4 right-4 z-50">
         <div className="flex items-center gap-3">
@@ -113,17 +132,20 @@ function App() {
               className="button-indicator px-4 py-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2"
             >
               <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
-              {t('app.about')}
+              {t("app.about")}
             </button>
             <button
               onClick={() => setShowLikes(true)}
               className="button-indicator px-4 py-2 text-slate-700 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2"
             >
               <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
-              {t('app.likes')}
+              {t("app.likes")}
             </button>
           </div>
-          <div className="rounded-full p-1 border shadow-lg bg-white/95 backdrop-blur-xl border-white/40" style={{ zIndex: 9998 }}>
+          <div
+            className="rounded-full p-1 border shadow-lg bg-white/95 backdrop-blur-xl border-white/40"
+            style={{ zIndex: 9998 }}
+          >
             <LanguageSelector />
           </div>
         </div>
@@ -143,7 +165,7 @@ function App() {
       {loading && articles.length > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 glass-effect px-6 py-3 rounded-full shadow-lg border border-white/20 pointer-events-none z-[60]">
           <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
-          <span className="text-slate-700 font-medium">{t('common.loadingMore')}</span>
+          <span className="text-slate-700 font-medium">{t("common.loadingMore")}</span>
         </div>
       )}
 

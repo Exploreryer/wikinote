@@ -5,7 +5,6 @@ import { useToast } from "../contexts/ToastContext"
 import { useI18n } from "../hooks/useI18n"
 import "../styles/WikiCard.css"
 import type { ArticleProps } from "../types/ArticleProps"
-import { ProgressiveImage } from "./ProgressiveImage"
 
 interface WikiCardProps extends ArticleProps {
   priority?: boolean
@@ -63,14 +62,14 @@ export function WikiCard({ article, priority = false }: WikiCardProps) {
           title={`Read more about ${article.displaytitle}`}
         >
           {article.thumbnail ? (
-            <ProgressiveImage
+            <img
               src={article.thumbnail.source}
               alt={article.displaytitle}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               width={article.thumbnail.width}
               height={article.thumbnail.height}
-              fetchPriority={priority ? "high" : "auto"}
+              loading={priority ? "eager" : "lazy"}
+              decoding="async"
             />
           ) : (
             <div className="bg-gray-200 h-full w-full group-hover:bg-gray-300 transition-colors duration-300" />
