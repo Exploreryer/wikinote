@@ -9,3 +9,8 @@ All notable changes to this project will be documented in this file.
 - Docs: 1 update(s)
 - Changed: 46 update(s)
 - Chore: 2 task(s)
+
+## v0.0.2 - 2025-08-09
+
+- Added: 1 change(s)
+- Changed: 2 update(s)
