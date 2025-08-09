@@ -7,7 +7,11 @@ import '../styles/WikiCard.css';
 import { useToast } from '../contexts/ToastContext';
 import { ProgressiveImage } from './ProgressiveImage';
 
-export function WikiCard({ article }: ArticleProps) {
+interface WikiCardProps extends ArticleProps {
+    priority?: boolean;
+}
+
+export function WikiCard({ article, priority = false }: WikiCardProps) {
     const [shareError, setShareError] = useState(false);
     const [shareSuccess, setShareSuccess] = useState(false);
     const { toggleLike, isLiked } = useLikedArticles();
@@ -63,13 +67,10 @@ export function WikiCard({ article }: ArticleProps) {
                             src={article.thumbnail.source}
                             alt={article.displaytitle}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            sizes="(max-width: 640px) 100vw, 33vw"
-                            onLoad={() => {
-                                // Image loaded successfully
-                            }}
-                            onError={(e) => {
-                                console.error('Image failed to load:', e);
-                            }}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            width={article.thumbnail.width}
+                            height={article.thumbnail.height}
+                            fetchPriority={priority ? 'high' : 'auto'}
                         />
                     ) : (
                         <div className="bg-gray-200 h-full w-full group-hover:bg-gray-300 transition-colors duration-300" />

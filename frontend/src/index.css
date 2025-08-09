@@ -325,6 +325,12 @@ html, body {
   will-change: transform;
 }
 
+/* Hint browser to skip off-screen rendering; reserve space to avoid CLS */
+.wiki-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 300px 180px;
+}
+
 .modern-card:hover,
 .glass-effect:hover,
 .wiki-card:hover {

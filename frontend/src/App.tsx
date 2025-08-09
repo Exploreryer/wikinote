@@ -79,7 +79,7 @@ function App() {
   }, [ready, fetchArticles]);
 
   return (
-    <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll">
+    <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll" style={{ contain: 'content' }}>
 
 
       <div className="fixed top-4 left-4 z-50">
@@ -147,8 +147,8 @@ function App() {
 
       {/* Content area */}
       <div className="masonry-grid">
-        {articles.map((article) => (
-          <WikiCard key={article.pageid} article={article} />
+        {articles.map((article, idx) => (
+          <WikiCard key={article.pageid} article={article} priority={idx < 6} />
         ))}
         
         {/* Show skeleton when loading more - only when there's content and loading */}
@@ -166,7 +166,7 @@ function App() {
       
       {/* Loading indicator when loading more */}
       {loading && articles.length > 0 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 glass-effect px-6 py-3 rounded-full shadow-lg border border-white/20">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 glass-effect px-6 py-3 rounded-full shadow-lg border border-white/20 pointer-events-none z-[60]">
           <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
           <span className="text-slate-700 font-medium">{t('common.loadingMore')}</span>
         </div>

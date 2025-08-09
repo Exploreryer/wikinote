@@ -37,7 +37,6 @@ export function useLocalization() {
       // Persist before reload to ensure it is available on next startup
       await StorageAdapter.set("lang", newLanguage.id);
       setCurrentLanguage(newLanguage);
-      window.location.reload();
     } else {
       console.warn(`Language not found: ${languageId}`);
     }

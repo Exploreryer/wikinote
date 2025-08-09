@@ -95,7 +95,12 @@ export function useWikiArticles() {
       if (forBuffer) {
         setBuffer(newArticles);
       } else {
-        setArticles((prev) => [...prev, ...newArticles]);
+        setArticles((prev) => {
+          const merged = [...prev, ...newArticles];
+          // Cap the array to avoid unbounded memory. Keep latest 200.
+          const MAX = 200;
+          return merged.length > MAX ? merged.slice(merged.length - MAX) : merged;
+        });
         // Do not fetch the next batch immediately to avoid overfetching
         setTimeout(() => fetchArticles(true), 1000);
       }
@@ -121,7 +126,11 @@ export function useWikiArticles() {
 
   const getMoreArticles = useCallback(() => {
     if (buffer.length > 0) {
-      setArticles((prev) => [...prev, ...buffer]);
+      setArticles((prev) => {
+        const merged = [...prev, ...buffer];
+        const MAX = 200;
+        return merged.length > MAX ? merged.slice(merged.length - MAX) : merged;
+      });
       setBuffer([]);
       setTimeout(() => fetchArticles(true), 100);
     } else {

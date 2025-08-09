@@ -31,10 +31,12 @@ export function generateBlurPlaceholder(color: string = '#f3f4f6'): string {
   ];
 
   // 创建一个复杂的 40x40 SVG，模拟真实图片的有机感
+  // SVG 中不能包含非 ASCII 文本，否则浏览器 btoa 会抛出 InvalidCharacterError
+  // 移除所有非 ASCII 注释，使用英文注释，并对字符串做 UTF-8 安全的 base64 编码
   const svg = `
     <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- 主渐变 -->
+        <!-- main radial gradient -->
         <radialGradient id="mainGrad" cx="30%" cy="20%" r="60%">
           <stop offset="0%" style="stop-color:${colors[0]};stop-opacity:0.9" />
           <stop offset="35%" style="stop-color:${colors[1]};stop-opacity:0.7" />
@@ -42,20 +44,20 @@ export function generateBlurPlaceholder(color: string = '#f3f4f6'): string {
           <stop offset="100%" style="stop-color:${colors[3]};stop-opacity:0.6" />
         </radialGradient>
         
-        <!-- 辅助渐变增加层次 -->
+        <!-- overlay gradient to add depth -->
         <linearGradient id="overlayGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style="stop-color:${colors[4]};stop-opacity:0.3" />
           <stop offset="50%" style="stop-color:${colors[1]};stop-opacity:0.1" />
           <stop offset="100%" style="stop-color:${colors[0]};stop-opacity:0.4" />
         </linearGradient>
         
-        <!-- 精细的高斯模糊 -->
+        <!-- light gaussian blur -->
         <filter id="premiumBlur" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="blur"/>
           <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
         </filter>
         
-        <!-- 轻微的噪点纹理 -->
+        <!-- subtle noise texture -->
         <filter id="texture" x="0%" y="0%" width="100%" height="100%">
           <feTurbulence baseFrequency="0.9" numOctaves="1" seed="1" stitchTiles="stitch"/>
           <feColorMatrix type="saturate" values="0"/>
@@ -66,18 +68,44 @@ export function generateBlurPlaceholder(color: string = '#f3f4f6'): string {
         </filter>
       </defs>
       
-      <!-- 主背景 -->
+      <!-- background fill -->
       <rect width="100%" height="100%" fill="url(#mainGrad)" filter="url(#premiumBlur)"/>
       
-      <!-- 叠加层增加深度 -->
+      <!-- overlay depth -->
       <rect width="100%" height="100%" fill="url(#overlayGrad)" opacity="0.6"/>
       
-      <!-- 轻微纹理（可选） -->
+      <!-- texture (optional) -->
       <rect width="100%" height="100%" fill="${colors[2]}" filter="url(#texture)" opacity="0.1"/>
     </svg>
   `;
+
+  const toBase64 = (input: string): string => {
+    try {
+      // Prefer UTF-8 safe encoding
+      const utf8 = new TextEncoder().encode(input);
+      let binary = '';
+      for (let i = 0; i < utf8.length; i++) {
+        binary += String.fromCharCode(utf8[i]);
+      }
+      return btoa(binary);
+    } catch (_) {
+      // Fallbacks for older environments
+      try {
+        // eslint-disable-next-line deprecation/deprecation
+        return btoa(unescape(encodeURIComponent(input)));
+      } catch {
+        // Node-like fallback if Buffer exists
+        // @ts-expect-error Buffer may not exist in browser
+        if (typeof Buffer !== 'undefined') {
+          // @ts-expect-error Buffer may not exist in browser
+          return Buffer.from(input, 'utf-8').toString('base64');
+        }
+        throw new Error('Base64 encoding is not supported in this environment');
+      }
+    }
+  };
   
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
+  return `data:image/svg+xml;base64,${toBase64(svg)}`;
 }
 
 /**

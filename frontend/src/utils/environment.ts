@@ -34,7 +34,15 @@ export class StorageAdapter {
           if (typeof value === 'undefined' || value === null) {
             // Fallback to localStorage mirror if any
             const mirrored = localStorage.getItem(key);
-            resolve(mirrored ? (JSON.parse(mirrored) as T) : null);
+            if (mirrored == null) {
+              resolve(null);
+            } else {
+              try {
+                resolve(JSON.parse(mirrored) as T);
+              } catch {
+                resolve(mirrored as unknown as T);
+              }
+            }
           } else {
             resolve(value ?? null);
           }
@@ -42,7 +50,13 @@ export class StorageAdapter {
       });
     } else {
       const item = localStorage.getItem(key);
-      return item ? ((JSON.parse(item) as unknown) as T) : null;
+      if (item == null) return null;
+      // Be tolerant to legacy plain-string values (e.g. 'en') that aren't JSON
+      try {
+        return JSON.parse(item) as unknown as T;
+      } catch {
+        return item as unknown as T;
+      }
     }
   }
 

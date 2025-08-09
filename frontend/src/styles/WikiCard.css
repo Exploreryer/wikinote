@@ -70,7 +70,7 @@
 .wiki-card-image {
   position: relative;
   width: 100%;
-  padding-top: 60%; /* Increase image area to 60% */
+  aspect-ratio: 5 / 3; /* give a reasonable default; real size is reserved via width/height */
   overflow: hidden;
   border-radius: 20px 20px 0 0;
   background: linear-gradient(135deg, rgba(148,163,184,0.12), rgba(241,245,249,0.12));
@@ -95,7 +95,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
 }
 
 /* Hover effect driven by group-hover */
