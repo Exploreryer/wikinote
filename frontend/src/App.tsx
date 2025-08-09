@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
-import { useInView, useScroll } from "motion/react"
+import { useInView, useMotionValueEvent, useScroll } from "motion/react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { AboutModal } from "./components/AboutModal"
 import { LanguageSelector } from "./components/LanguageSelector"
@@ -17,7 +17,12 @@ function App() {
   const [showAbout, setShowAbout] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
   const { currentLanguage } = useLocalization()
-  useScroll() // ensure motion scroll values are initialized (not used directly)
+  const [isScrolled, setIsScrolled] = useState<boolean>(false)
+  const { scrollYProgress } = useScroll() // ensure motion scroll values are initialized (not used directly)
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setIsScrolled(latest > 0.04)
+  })
+
   const { t } = useI18n()
   const { scrollY } = useScrollPosition(30)
   const titleOpacity = Math.max(0, 1 - scrollY / 80)
@@ -126,23 +131,36 @@ function App() {
       {/* Top-right controls */}
       <div className="fixed top-4 right-4 z-50">
         <div className="flex items-center gap-3">
-          <div className="modern-button-group glass-effect flex items-center rounded-full p-1 shadow-lg">
+          <div
+            className={`modern-button-group flex items-center rounded-full p-1 border shadow-lg transition-all duration-300 ${
+              isScrolled
+                ? "bg-white/95 backdrop-blur-xl border-white/40 shadow-xl"
+                : "bg-white/10 backdrop-blur-xl border-white/20"
+            }`}
+          >
             <button
               onClick={() => setShowAbout(true)}
-              className="button-indicator px-4 py-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2"
+              className="button-indicator px-4 py-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
             >
-              <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
+              <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
               {t("app.about")}
             </button>
             <button
               onClick={() => setShowLikes(true)}
-              className="button-indicator px-4 py-2 text-slate-700 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2"
+              className="button-indicator px-4 py-2 text-slate-700 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
             >
-              <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
+              <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
               {t("app.likes")}
             </button>
           </div>
-          <div className="glass-effect rounded-full p-1 shadow-lg" style={{ zIndex: 9998 }}>
+          <div
+            className={`rounded-full p-1 border shadow-lg relative transition-all duration-300 ${
+              isScrolled
+                ? "bg-white/95 backdrop-blur-xl border-white/40 shadow-xl"
+                : "bg-white/10 backdrop-blur-xl border-white/20"
+            }`}
+            style={{ zIndex: 9998 }}
+          >
             <LanguageSelector />
           </div>
         </div>
