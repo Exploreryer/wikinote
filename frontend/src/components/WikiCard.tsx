@@ -66,7 +66,7 @@ export function WikiCard({ article, priority = false }: WikiCardProps) {
             <ProgressiveImage
               src={article.thumbnail.source}
               alt={article.displaytitle}
-              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
               width={article.thumbnail.width}
               height={article.thumbnail.height}
