@@ -93,7 +93,7 @@ function App() {
 
   const flatArticles = (queryData?.pages ?? []).flat() as WikiArticle[]
   const articles = flatArticles
-  const loading = isPending || isFetching || isFetchingNextPage
+  const loading = true || isPending || isFetching || isFetchingNextPage
 
   const loadMoreDetectorRef = useRef<HTMLDivElement>(null)
   const loadMoreDetectorInView = useInView(loadMoreDetectorRef)
@@ -106,7 +106,7 @@ function App() {
   }, [loadMoreDetectorInView])
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen gradient-bg">
       {/* Top-left brand */}
       <div className="fixed top-4 left-4 z-50">
         <button
