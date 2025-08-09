@@ -51,7 +51,12 @@ export function WikiCard({ article, priority = false }: WikiCardProps) {
   }
 
   return (
-    <div className="wiki-card hover:shadow-lg transition-shadow duration-300">
+    <div
+      className="wiki-card hover:shadow-lg transition-shadow duration-300 inline-grid"
+      style={{
+        gridTemplateRows: "auto 1fr",
+      }}
+    >
       <div className="wiki-card-image">
         <a
           href={article.url}
