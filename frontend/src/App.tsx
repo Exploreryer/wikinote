@@ -93,7 +93,7 @@ function App() {
 
   const flatArticles = (queryData?.pages ?? []).flat() as WikiArticle[]
   const articles = flatArticles
-  const loading = true || isPending || isFetching || isFetchingNextPage
+  const loading = isPending || isFetching || isFetchingNextPage
 
   const loadMoreDetectorRef = useRef<HTMLDivElement>(null)
   const loadMoreDetectorInView = useInView(loadMoreDetectorRef)
