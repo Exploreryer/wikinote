@@ -48,15 +48,27 @@ function App() {
     enabled: !showAbout && !showLikes, // Only enable when no modals are open
   });
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [target] = entries;
-      if (target.isIntersecting && !loading && !error) {
+  // Keep latest loading/error in refs to avoid recreating observer callback
+  const loadingRef = useRef(loading);
+  const errorRef = useRef(error);
+  useEffect(() => {
+    loadingRef.current = loading;
+    errorRef.current = error;
+  }, [loading, error]);
+
+  const hasRequestedSinceVisibleRef = useRef(false);
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [target] = entries;
+    if (target.isIntersecting) {
+      if (!hasRequestedSinceVisibleRef.current && !loadingRef.current && !errorRef.current) {
+        hasRequestedSinceVisibleRef.current = true;
         fetchArticles();
       }
-    },
-    [loading, error, fetchArticles]
-  );
+    } else {
+      // Reset when sentinel leaves the viewport
+      hasRequestedSinceVisibleRef.current = false;
+    }
+  }, [fetchArticles]);
 
   useEffect(() => {
     const observer = createLazyLoadObserver(handleObserver, {

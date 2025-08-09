@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useLocalization } from "./useLocalization";
 import { useI18n } from "./useI18n";
 import type { WikiArticle, AppError } from "../types/ArticleProps";
@@ -12,10 +12,13 @@ export function useWikiArticles() {
   const [error, setError] = useState<AppError | null>(null);
   const { currentLanguage, ready } = useLocalization();
   const { t } = useI18n();
+  // Guard ref to prevent overlapping/infinite fetch loops without depending on loading in the callback deps
+  const isFetchingRef = useRef(false);
 
   const fetchArticles = useCallback(async (forBuffer = false) => {
-    if (loading) return;
+    if (isFetchingRef.current) return;
     if (!ready) return;
+    isFetchingRef.current = true;
     setLoading(true);
     setError(null);
     
@@ -120,9 +123,10 @@ export function useWikiArticles() {
       };
       setError(appError);
     } finally {
+      isFetchingRef.current = false;
       setLoading(false);
     }
-  }, [currentLanguage, t, loading, ready]);
+  }, [currentLanguage, t, ready]);
 
   const getMoreArticles = useCallback(() => {
     if (buffer.length > 0) {
