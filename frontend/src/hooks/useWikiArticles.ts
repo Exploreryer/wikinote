@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react"
 import { useInfiniteQuery } from "@tanstack/react-query"
+import { useCallback, useState } from "react"
 import type { AppError, WikiArticle } from "../types/ArticleProps"
 import { fetchWithCORS } from "../utils/environment"
 import { preloadImages, retry } from "../utils/performance"
@@ -110,13 +110,14 @@ export function useWikiArticles() {
 
   const loading = isPending || isFetching || isFetchingNextPage
 
-  const mappedError: AppError | null = !errorDismissed && queryError
-    ? {
-        title: t("errors.fetchFailed"),
-        message: queryError instanceof Error ? queryError.message : t("errors.somethingWrong"),
-        action: { label: t("common.retry"), handler: () => refetch() },
-      }
-    : null
+  const mappedError: AppError | null =
+    !errorDismissed && queryError
+      ? {
+          title: t("errors.fetchFailed"),
+          message: queryError instanceof Error ? queryError.message : t("errors.somethingWrong"),
+          action: { label: t("common.retry"), handler: () => refetch() },
+        }
+      : null
 
   const clearError = () => setErrorDismissed(true)
 
