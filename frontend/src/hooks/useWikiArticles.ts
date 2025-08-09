@@ -8,7 +8,6 @@ import { useLocalization } from "./useLocalization"
 export function useWikiArticles() {
   const [articles, setArticles] = useState<WikiArticle[]>([])
   const [loading, setLoading] = useState(false)
-  const [buffer, setBuffer] = useState<WikiArticle[]>([])
   const [error, setError] = useState<AppError | null>(null)
   const { currentLanguage, ready } = useLocalization()
   const { t } = useI18n()
@@ -16,7 +15,7 @@ export function useWikiArticles() {
   const isFetchingRef = useRef(false)
 
   const fetchArticles = useCallback(
-    async (forBuffer = false) => {
+    async () => {
       if (isFetchingRef.current) return
       if (!ready) return
       isFetchingRef.current = true
@@ -97,18 +96,12 @@ export function useWikiArticles() {
 
         preloadImages(imageSources).catch(console.warn)
 
-        if (forBuffer) {
-          setBuffer(newArticles)
-        } else {
-          setArticles((prev) => {
-            const merged = [...prev, ...newArticles]
-            // Cap the array to avoid unbounded memory. Keep latest 200.
-            const MAX = 200
-            return merged.length > MAX ? merged.slice(merged.length - MAX) : merged
-          })
-          // Do not fetch the next batch immediately to avoid overfetching
-          setTimeout(() => fetchArticles(true), 1000)
-        }
+        // 直接合并到 articles，不再使用 buffer 或后台预取
+        setArticles((prev) => {
+          const merged = [...prev, ...newArticles]
+          const MAX = 200
+          return merged.length > MAX ? merged.slice(merged.length - MAX) : merged
+        })
       } catch (fetchError) {
         console.error("Error fetching articles:", fetchError)
         const appError: AppError = {
@@ -121,7 +114,7 @@ export function useWikiArticles() {
               : t("errors.somethingWrong"),
           action: {
             label: t("common.retry"),
-            handler: () => fetchArticles(forBuffer),
+            handler: () => fetchArticles(),
           },
         }
         setError(appError)
@@ -133,20 +126,6 @@ export function useWikiArticles() {
     [currentLanguage, t, ready]
   )
 
-  const getMoreArticles = useCallback(() => {
-    if (buffer.length > 0) {
-      setArticles((prev) => {
-        const merged = [...prev, ...buffer]
-        const MAX = 200
-        return merged.length > MAX ? merged.slice(merged.length - MAX) : merged
-      })
-      setBuffer([])
-      setTimeout(() => fetchArticles(true), 100)
-    } else {
-      fetchArticles(false)
-    }
-  }, [buffer, fetchArticles])
-
   const clearError = () => setError(null)
 
   return {
@@ -154,6 +133,6 @@ export function useWikiArticles() {
     loading,
     error,
     clearError,
-    fetchArticles: getMoreArticles,
+    fetchArticles,
   }
 }
