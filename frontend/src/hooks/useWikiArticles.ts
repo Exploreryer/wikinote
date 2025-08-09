@@ -7,7 +7,6 @@ import { useI18n } from "./useI18n"
 import { useLocalization } from "./useLocalization"
 
 export function useWikiArticles() {
-  const [articles, setArticles] = useState<WikiArticle[]>([])
   const [errorDismissed, setErrorDismissed] = useState(false)
   const { currentLanguage } = useLocalization()
   const { t } = useI18n()
@@ -99,14 +98,7 @@ export function useWikiArticles() {
   })
 
   const flatArticles = (queryData?.pages ?? []).flat() as WikiArticle[]
-  const limitedArticles = flatArticles.length > 200 ? flatArticles.slice(flatArticles.length - 200) : flatArticles
-
-  // 同步内部 articles 引用，保持返回 API 稳定
-  if (articles !== limitedArticles) {
-    queueMicrotask(() => {
-      setArticles(limitedArticles)
-    })
-  }
+  const articles = flatArticles.length > 200 ? flatArticles.slice(flatArticles.length - 200) : flatArticles
 
   const loading = isPending || isFetching || isFetchingNextPage
 
