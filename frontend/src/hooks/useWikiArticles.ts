@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import { useCallback, useState } from "react"
 import type { AppError, WikiArticle } from "../types/ArticleProps"
 import { fetchWithCORS } from "../utils/environment"
-import { preloadImages, retry } from "../utils/performance"
+import { preloadImages } from "../utils/performance"
 import { useI18n } from "./useI18n"
 import { useLocalization } from "./useLocalization"
 
@@ -11,41 +11,32 @@ export function useWikiArticles() {
   const { currentLanguage } = useLocalization()
   const { t } = useI18n()
   const queryFn = useCallback(async () => {
-    const fetchWithRetry = () =>
-      retry(
-        async () => {
-          const response = await fetchWithCORS(
-            currentLanguage.api +
-              new URLSearchParams({
-                action: "query",
-                format: "json",
-                generator: "random",
-                grnnamespace: "0",
-                prop: "extracts|info|pageimages",
-                inprop: "url|varianttitles",
-                grnlimit: "20",
-                exintro: "1",
-                exlimit: "max",
-                exsentences: "5",
-                explaintext: "1",
-                piprop: "thumbnail",
-                pithumbsize: "480",
-                origin: "*",
-                variant: currentLanguage.id,
-              })
-          )
+    const response = await fetchWithCORS(
+      currentLanguage.api +
+        new URLSearchParams({
+          action: "query",
+          format: "json",
+          generator: "random",
+          grnnamespace: "0",
+          prop: "extracts|info|pageimages",
+          inprop: "url|varianttitles",
+          grnlimit: "20",
+          exintro: "1",
+          exlimit: "max",
+          exsentences: "5",
+          explaintext: "1",
+          piprop: "thumbnail",
+          pithumbsize: "480",
+          origin: "*",
+          variant: currentLanguage.id,
+        })
+    )
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-          }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
 
-          return response.json()
-        },
-        3,
-        1000
-      )
-
-    const data = await fetchWithRetry()
+    const data = await response.json()
     if (!data.query || !data.query.pages) {
       throw new Error("Invalid API response")
     }
@@ -93,7 +84,7 @@ export function useWikiArticles() {
     initialPageParam: 0,
     getNextPageParam: (_lastPage: WikiArticle[], allPages: WikiArticle[][]) => allPages.length,
     enabled: false, // 手动触发，保持与原始逻辑一致
-    retry: 2,
+    retry: false,
     refetchOnWindowFocus: false,
   })
 
