@@ -1,112 +1,114 @@
-import { useEffect, useRef, useCallback, useState } from "react";
-import { WikiCard } from "./components/WikiCard";
-import { Loader2 } from "lucide-react";
-import { Analytics } from "@vercel/analytics/react";
-import { LanguageSelector } from "./components/LanguageSelector";
-import { AboutModal } from "./components/AboutModal";
-import { LikesModal } from "./components/LikesModal";
-import { ErrorNotification } from "./components/ErrorNotification";
-import { isExtension } from "./utils/environment";
+import { Analytics } from "@vercel/analytics/react"
+import { Loader2 } from "lucide-react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { AboutModal } from "./components/AboutModal"
+import { ErrorNotification } from "./components/ErrorNotification"
+import { LanguageSelector } from "./components/LanguageSelector"
+import { LikesModal } from "./components/LikesModal"
+import { WikiCard } from "./components/WikiCard"
+import { isExtension } from "./utils/environment"
 
-import { useWikiArticles } from "./hooks/useWikiArticles";
-import { useLocalization } from "./hooks/useLocalization";
-import { useScrollPosition } from "./hooks/useScrollPosition";
-import { useI18n } from "./hooks/useI18n";
-import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation";
-import { useImagePreloader } from "./hooks/useImagePreloader";
-import { SkeletonGrid, LoadingSkeletonCards } from "./components/SkeletonCard";
-import { createLazyLoadObserver } from "./utils/performance";
+import { LoadingSkeletonCards, SkeletonGrid } from "./components/SkeletonCard"
+import { useI18n } from "./hooks/useI18n"
+import { useImagePreloader } from "./hooks/useImagePreloader"
+import { useKeyboardNavigation } from "./hooks/useKeyboardNavigation"
+import { useLocalization } from "./hooks/useLocalization"
+import { useScrollPosition } from "./hooks/useScrollPosition"
+import { useWikiArticles } from "./hooks/useWikiArticles"
+import { createLazyLoadObserver } from "./utils/performance"
 
 function App() {
-  const [showAbout, setShowAbout] = useState(false);
-  const [showLikes, setShowLikes] = useState(false);
-  const { articles, loading, error, clearError, fetchArticles } = useWikiArticles();
-  const { ready } = useLocalization();
+  const [showAbout, setShowAbout] = useState(false)
+  const [showLikes, setShowLikes] = useState(false)
+  const { articles, loading, error, clearError, fetchArticles } = useWikiArticles()
+  const { ready } = useLocalization()
 
-  const { t } = useI18n();
-  const observerTarget = useRef(null);
-  const { scrollY, isScrolled } = useScrollPosition(30);
-  const titleOpacity = Math.max(0, 1 - (scrollY / 80));
+  const { t } = useI18n()
+  const observerTarget = useRef(null)
+  const { scrollY, isScrolled } = useScrollPosition(30)
+  const titleOpacity = Math.max(0, 1 - scrollY / 80)
 
   // Preload images for better user experience
-  const imageUrls = articles
-    .filter(article => article.thumbnail)
-    .map(article => article.thumbnail!.source);
-  
+  const imageUrls = articles.filter((article) => article.thumbnail).map((article) => article.thumbnail!.source)
+
   useImagePreloader(imageUrls, {
     enabled: articles.length > 0,
     maxConcurrent: 2, // Conservative to avoid overwhelming the browser
-    priority: 'normal'
-  });
+    priority: "normal",
+  })
 
   // Keyboard shortcut support
   useKeyboardNavigation({
     onEscape: () => {
-      if (showAbout) setShowAbout(false);
-      if (showLikes) setShowLikes(false);
+      if (showAbout) setShowAbout(false)
+      if (showLikes) setShowLikes(false)
     },
     enabled: !showAbout && !showLikes, // Only enable when no modals are open
-  });
+  })
 
   // Keep latest loading/error in refs to avoid recreating observer callback
-  const loadingRef = useRef(loading);
-  const errorRef = useRef(error);
+  const loadingRef = useRef(loading)
+  const errorRef = useRef(error)
   useEffect(() => {
-    loadingRef.current = loading;
-    errorRef.current = error;
-  }, [loading, error]);
+    loadingRef.current = loading
+    errorRef.current = error
+  }, [loading, error])
 
-  const hasRequestedSinceVisibleRef = useRef(false);
-  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
-    const [target] = entries;
-    if (target.isIntersecting) {
-      if (!hasRequestedSinceVisibleRef.current && !loadingRef.current && !errorRef.current) {
-        hasRequestedSinceVisibleRef.current = true;
-        fetchArticles();
+  const hasRequestedSinceVisibleRef = useRef(false)
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries
+      if (target.isIntersecting) {
+        if (!hasRequestedSinceVisibleRef.current && !loadingRef.current && !errorRef.current) {
+          hasRequestedSinceVisibleRef.current = true
+          fetchArticles()
+        }
+      } else {
+        // Reset when sentinel leaves the viewport
+        hasRequestedSinceVisibleRef.current = false
       }
-    } else {
-      // Reset when sentinel leaves the viewport
-      hasRequestedSinceVisibleRef.current = false;
-    }
-  }, [fetchArticles]);
+    },
+    [fetchArticles]
+  )
 
   useEffect(() => {
     const observer = createLazyLoadObserver(handleObserver, {
       threshold: 0.1,
       // Prefetch content earlier to reduce visible pop-in
       rootMargin: "400px",
-    });
+    })
 
     if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+      observer.observe(observerTarget.current)
     }
 
-    return () => observer.disconnect();
-  }, [handleObserver]);
+    return () => observer.disconnect()
+  }, [handleObserver])
 
   useEffect(() => {
     if (ready) {
-      fetchArticles();
+      fetchArticles()
     }
-  }, [ready, fetchArticles]);
+  }, [ready, fetchArticles])
 
   return (
-    <div className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll" style={{ contain: 'content' }}>
-
-
+    <div
+      className="h-screen w-full gradient-bg text-slate-800 overflow-y-scroll snap-y snap-mandatory hide-scroll"
+      style={{ contain: "content" }}
+    >
       <div className="fixed top-4 left-4 z-50">
         <button
           onClick={() => window.location.reload()}
           className={`text-2xl font-bold text-glow hover:opacity-90 transition-all duration-300 px-2 py-1 hover:scale-105 text-slate-800 ${
-            titleOpacity === 0 ? 'pointer-events-none' : ''
+            titleOpacity === 0 ? "pointer-events-none" : ""
           }`}
           style={{
             opacity: titleOpacity,
-            transform: `translateY(${titleOpacity === 0 ? '-10px' : '0'})`,
-            transition: 'all 0.3s ease-in-out'
+            transform: `translateY(${titleOpacity === 0 ? "-10px" : "0"})`,
+            transition: "all 0.3s ease-in-out",
           }}
         >
-          {t('app.title')}
+          {t("app.title")}
         </button>
       </div>
 
@@ -114,33 +116,38 @@ function App() {
         {/* Modern design button group */}
         <div className="flex items-center gap-3">
           {/* Function button group */}
-          <div className={`modern-button-group flex items-center rounded-full p-1 border shadow-lg transition-all duration-300 ${
-            isScrolled 
-              ? 'bg-white/95 backdrop-blur-xl border-white/40 shadow-xl' 
-              : 'bg-white/10 backdrop-blur-xl border-white/20'
-          }`}>
+          <div
+            className={`modern-button-group flex items-center rounded-full p-1 border shadow-lg transition-all duration-300 ${
+              isScrolled
+                ? "bg-white/95 backdrop-blur-xl border-white/40 shadow-xl"
+                : "bg-white/10 backdrop-blur-xl border-white/20"
+            }`}
+          >
             <button
               onClick={() => setShowAbout(!showAbout)}
               className="button-indicator px-4 py-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
             >
               <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
-              {t('app.about')}
+              {t("app.about")}
             </button>
             <button
               onClick={() => setShowLikes(!showLikes)}
               className="button-indicator px-4 py-2 text-slate-700 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2 group"
             >
               <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
-              {t('app.likes')}
+              {t("app.likes")}
             </button>
           </div>
-          
+
           {/* Language selector - Independent design, ensure highest level */}
-          <div className={`rounded-full p-1 border shadow-lg relative transition-all duration-300 ${
-            isScrolled 
-              ? 'bg-white/95 backdrop-blur-xl border-white/40 shadow-xl' 
-              : 'bg-white/10 backdrop-blur-xl border-white/20'
-          }`} style={{ zIndex: 9998, overflow: 'visible' }}>
+          <div
+            className={`rounded-full p-1 border shadow-lg relative transition-all duration-300 ${
+              isScrolled
+                ? "bg-white/95 backdrop-blur-xl border-white/40 shadow-xl"
+                : "bg-white/10 backdrop-blur-xl border-white/20"
+            }`}
+            style={{ zIndex: 9998, overflow: "visible" }}
+          >
             <LanguageSelector />
           </div>
         </div>
@@ -150,42 +157,35 @@ function App() {
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
 
       <LikesModal isOpen={showLikes} onClose={() => setShowLikes(false)} />
-      
+
       {/* Error notification */}
-      <ErrorNotification 
-        error={error} 
-        onClose={clearError}
-      />
+      <ErrorNotification error={error} onClose={clearError} />
 
       {/* Content area */}
       <div className="masonry-grid">
         {articles.map((article, idx) => (
           <WikiCard key={article.pageid} article={article} priority={idx < 6} />
         ))}
-        
+
         {/* Show skeleton when loading more - only when there's content and loading */}
-        {loading && articles.length > 0 && (
-          <LoadingSkeletonCards />
-        )}
-        
+        {loading && articles.length > 0 && <LoadingSkeletonCards />}
+
         {/* Initial loading skeleton - in the same container */}
-        {articles.length === 0 && loading && (
-          <SkeletonGrid count={6} />
-        )}
-        
+        {articles.length === 0 && loading && <SkeletonGrid count={6} />}
+
         <div ref={observerTarget} className="h-10 col-span-full" />
       </div>
-      
+
       {/* Loading indicator when loading more */}
       {loading && articles.length > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 glass-effect px-6 py-3 rounded-full shadow-lg border border-white/20 pointer-events-none z-[60]">
           <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
-          <span className="text-slate-700 font-medium">{t('common.loadingMore')}</span>
+          <span className="text-slate-700 font-medium">{t("common.loadingMore")}</span>
         </div>
       )}
       {!isExtension && <Analytics />}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
