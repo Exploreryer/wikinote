@@ -4,15 +4,15 @@
  */
 export function getLowResThumbnail(originalUrl: string, width: number = 160): string {
   try {
-    const url = new URL(originalUrl);
-    if (!url.host.includes('upload.wikimedia.org') || !url.pathname.includes('/thumb/')) {
-      return originalUrl;
+    const url = new URL(originalUrl)
+    if (!url.host.includes("upload.wikimedia.org") || !url.pathname.includes("/thumb/")) {
+      return originalUrl
     }
-    const replaced = url.pathname.replace(/\/(\d+)px-/i, `/${width}px-`);
-    url.pathname = replaced;
-    return url.toString();
+    const replaced = url.pathname.replace(/\/(\d+)px-/i, `/${width}px-`)
+    url.pathname = replaced
+    return url.toString()
   } catch {
-    return originalUrl;
+    return originalUrl
   }
 }
 
@@ -20,15 +20,15 @@ export function getLowResThumbnail(originalUrl: string, width: number = 160): st
  * Generate a premium base64 placeholder with sophisticated gradient
  * Creates a beautiful, organic-looking blur that mimics real image content
  */
-export function generateBlurPlaceholder(color: string = '#f3f4f6'): string {
+export function generateBlurPlaceholder(color: string = "#f3f4f6"): string {
   // 生成多个颜色变体以模拟真实图片的色彩层次
   const colors = [
-    '#f8fafc', // 浅灰蓝
-    '#e2e8f0', // 中性灰
-    '#cbd5e1', // 偏蓝灰
-    '#94a3b8', // 深灰蓝
-    color       // 用户指定颜色
-  ];
+    "#f8fafc", // 浅灰蓝
+    "#e2e8f0", // 中性灰
+    "#cbd5e1", // 偏蓝灰
+    "#94a3b8", // 深灰蓝
+    color, // 用户指定颜色
+  ]
 
   // 创建一个复杂的 40x40 SVG，模拟真实图片的有机感
   // SVG 中不能包含非 ASCII 文本，否则浏览器 btoa 会抛出 InvalidCharacterError
@@ -77,35 +77,34 @@ export function generateBlurPlaceholder(color: string = '#f3f4f6'): string {
       <!-- texture (optional) -->
       <rect width="100%" height="100%" fill="${colors[2]}" filter="url(#texture)" opacity="0.1"/>
     </svg>
-  `;
+  `
 
   const toBase64 = (input: string): string => {
     try {
       // Prefer UTF-8 safe encoding
-      const utf8 = new TextEncoder().encode(input);
-      let binary = '';
+      const utf8 = new TextEncoder().encode(input)
+      let binary = ""
       for (let i = 0; i < utf8.length; i++) {
-        binary += String.fromCharCode(utf8[i]);
+        binary += String.fromCharCode(utf8[i])
       }
-      return btoa(binary);
-    } catch (_) {
+      return btoa(binary)
+    } catch {
       // Fallbacks for older environments
       try {
-        // eslint-disable-next-line deprecation/deprecation
-        return btoa(unescape(encodeURIComponent(input)));
+        return btoa(unescape(encodeURIComponent(input)))
       } catch {
         // Node-like fallback if Buffer exists
         // @ts-expect-error Buffer may not exist in browser
-        if (typeof Buffer !== 'undefined') {
+        if (typeof Buffer !== "undefined") {
           // @ts-expect-error Buffer may not exist in browser
-          return Buffer.from(input, 'utf-8').toString('base64');
+          return Buffer.from(input, "utf-8").toString("base64")
         }
-        throw new Error('Base64 encoding is not supported in this environment');
+        throw new Error("Base64 encoding is not supported in this environment")
       }
     }
-  };
-  
-  return `data:image/svg+xml;base64,${toBase64(svg)}`;
+  }
+
+  return `data:image/svg+xml;base64,${toBase64(svg)}`
 }
 
 /**
@@ -113,11 +112,11 @@ export function generateBlurPlaceholder(color: string = '#f3f4f6'): string {
  */
 export function preloadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
 }
 
 /**
@@ -129,8 +128,6 @@ export function getProgressiveImageSources(originalUrl: string) {
     lowRes: getLowResThumbnail(originalUrl, 40), // Very low res for quick load
     mediumRes: getLowResThumbnail(originalUrl, 160),
     highRes: getLowResThumbnail(originalUrl, 320),
-    fullRes: originalUrl
-  };
+    fullRes: originalUrl,
+  }
 }
-
-
