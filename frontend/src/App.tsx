@@ -1,15 +1,23 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView, useScroll } from "motion/react"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { LoadingSkeletonCards, SkeletonGrid } from "./components/SkeletonCard"
 import { WikiCard } from "./components/WikiCard"
+import { AboutModal } from "./components/AboutModal"
+import { LikesModal } from "./components/LikesModal"
+import { LanguageSelector } from "./components/LanguageSelector"
+import { Loader2 } from "lucide-react"
 import { useLocalization } from "./hooks/useLocalization"
+import { useI18n } from "./hooks/useI18n"
 import type { WikiArticle } from "./types/ArticleProps"
 import { fetchWithCORS } from "./utils/environment"
 
 function App() {
+  const [showAbout, setShowAbout] = useState(false)
+  const [showLikes, setShowLikes] = useState(false)
   const { currentLanguage } = useLocalization()
   useScroll() // ensure motion scroll values are initialized (not used directly)
+  const { t } = useI18n()
 
   // Query function to fetch a batch of random Wikipedia articles
   const queryFn = useMemo(() => {
@@ -95,13 +103,53 @@ function App() {
   }, [loadMoreDetectorInView])
 
   return (
-    <div className="masonry-grid">
-      {articles.map((article, idx) => (
-        <WikiCard key={article.pageid} article={article} priority={idx < 6} />
-      ))}
-      {isPending && <SkeletonGrid count={6} />}
-      {loading && <LoadingSkeletonCards />}
-      <div ref={loadMoreDetectorRef} className="h-10 col-span-full" />
+    <div className="relative min-h-screen">
+      {/* Top-right controls */}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex items-center gap-3">
+          <div className="modern-button-group flex items-center rounded-full p-1 border shadow-lg bg-white/95 backdrop-blur-xl border-white/40">
+            <button
+              onClick={() => setShowAbout(true)}
+              className="button-indicator px-4 py-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2"
+            >
+              <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
+              {t('app.about')}
+            </button>
+            <button
+              onClick={() => setShowLikes(true)}
+              className="button-indicator px-4 py-2 text-slate-700 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-300 text-sm font-medium flex items-center gap-2"
+            >
+              <div className="w-1.5 h-1.5 bg-current rounded-full opacity-60"></div>
+              {t('app.likes')}
+            </button>
+          </div>
+          <div className="rounded-full p-1 border shadow-lg bg-white/95 backdrop-blur-xl border-white/40" style={{ zIndex: 9998 }}>
+            <LanguageSelector />
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="masonry-grid">
+        {articles.map((article, idx) => (
+          <WikiCard key={article.pageid} article={article} priority={idx < 6} />
+        ))}
+        {isPending && <SkeletonGrid count={6} />}
+        {loading && <LoadingSkeletonCards />}
+        <div ref={loadMoreDetectorRef} className="h-10 col-span-full" />
+      </div>
+
+      {/* Floating global loading */}
+      {loading && articles.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 glass-effect px-6 py-3 rounded-full shadow-lg border border-white/20 pointer-events-none z-[60]">
+          <Loader2 className="h-5 w-5 animate-spin text-slate-700" />
+          <span className="text-slate-700 font-medium">{t('common.loadingMore')}</span>
+        </div>
+      )}
+
+      {/* Modals */}
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <LikesModal isOpen={showLikes} onClose={() => setShowLikes(false)} />
     </div>
   )
 }
