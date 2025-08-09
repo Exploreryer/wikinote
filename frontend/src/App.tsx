@@ -1,13 +1,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
-import { useScroll } from "motion/react"
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import { useInView, useScroll } from "motion/react"
+import { useEffect, useMemo, useRef } from "react"
+import { WikiCard } from "./components/WikiCard"
+import { LoadingSkeletonCards, SkeletonGrid } from "./components/SkeletonCard"
 import { useLocalization } from "./hooks/useLocalization"
 import type { WikiArticle } from "./types/ArticleProps"
 import { fetchWithCORS } from "./utils/environment"
 
 function App() {
   const { currentLanguage } = useLocalization()
-  const { scrollYProgress } = useScroll()
+  useScroll() // ensure motion scroll values are initialized (not used directly)
 
   // Query function to fetch a batch of random Wikipedia articles
   const queryFn = useMemo(() => {
@@ -65,7 +67,6 @@ function App() {
 
   const {
     data: queryData,
-    refetch,
     fetchNextPage,
     isFetching,
     isFetchingNextPage,
@@ -83,59 +84,26 @@ function App() {
   const flatArticles = (queryData?.pages ?? []).flat() as WikiArticle[]
   const articles = flatArticles
   const loading = isPending || isFetching || isFetchingNextPage
-  const fetchArticles = useCallback(() => {
-    return queryData ? fetchNextPage() : refetch()
-  }, [fetchNextPage, queryData, refetch])
 
-  // Keep latest loading flag in refs to avoid stale closures
-  const loadingRef = useRef(loading)
-  useEffect(() => {
-    loadingRef.current = loading
-  }, [loading])
+  const loadMoreDetectorRef = useRef<HTMLDivElement>(null)
+  const loadMoreDetectorInView = useInView(loadMoreDetectorRef)
 
-  // Initial load if empty
   useEffect(() => {
-    if (articles.length === 0 && !loadingRef.current) {
-      fetchArticles()
+    if (loadMoreDetectorInView) {
+      fetchNextPage()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loadMoreDetectorInView])
 
-  // Auto load next page when scrolled to 80% of the page height
-  const hasTriggeredRef = useRef(false)
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (p: number) => {
-      if (p >= 0.8) {
-        if (!hasTriggeredRef.current && !loadingRef.current) {
-          hasTriggeredRef.current = true
-          fetchArticles()
-        }
-      } else if (p < 0.7) {
-        // hysteresis to avoid rapid re-triggers around the threshold
-        hasTriggeredRef.current = false
-      }
-    })
-    return () => unsubscribe()
-  }, [fetchArticles, scrollYProgress])
-
+  const isInitialLoading = articles.length === 0 && loading
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Wiki Articles</h1>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {articles.map((a) => (
-          <a
-            key={a.pageid}
-            href={a.url}
-            target="_blank"
-            rel="noreferrer"
-            className="block rounded-lg border p-4 hover:shadow-md transition"
-          >
-            <div className="font-medium mb-2">{a.displaytitle}</div>
-            <div className="text-sm text-slate-600 line-clamp-3">{a.extract}</div>
-          </a>
-        ))}
-      </div>
-      {loading && <div className="text-sm text-slate-500">Loading...</div>}
+    <div className="masonry-grid">
+      {articles.map((article, idx) => (
+        <WikiCard key={article.pageid} article={article} priority={idx < 6} />
+      ))}
+      {isInitialLoading && <SkeletonGrid count={6} />}
+      {loading && articles.length > 0 && <LoadingSkeletonCards />}
+      <div ref={loadMoreDetectorRef} className="h-10 col-span-full" />
     </div>
   )
 }
