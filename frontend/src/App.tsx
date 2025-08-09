@@ -73,9 +73,8 @@ function App() {
 
   useEffect(() => {
     const observer = createLazyLoadObserver(handleObserver, {
-      threshold: 0.1,
-      // Prefetch content earlier to reduce visible pop-in
-      rootMargin: "400px",
+      threshold: 0,
+      rootMargin: "0px",
     })
 
     if (observerTarget.current) {
