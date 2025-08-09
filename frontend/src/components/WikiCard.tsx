@@ -11,6 +11,7 @@ interface WikiCardProps extends ArticleProps {
 }
 
 export function WikiCard({ article, priority = false }: WikiCardProps) {
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
   const [shareError, setShareError] = useState(false)
   const [shareSuccess, setShareSuccess] = useState(false)
   const { toggleLike, isLiked } = useLikedArticles()
@@ -70,10 +71,17 @@ export function WikiCard({ article, priority = false }: WikiCardProps) {
             <img
               src={article.thumbnail.source}
               alt={article.displaytitle}
-              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              className={`${
+                isImageLoaded ? "opacity-100" : "opacity-0"
+              } transition-opacity duration-300 w-full h-full object-cover transition-transform duration-300`}
               width={article.thumbnail.width}
               height={article.thumbnail.height}
               loading={priority ? "eager" : "lazy"}
+              onLoad={() => setIsImageLoaded(true)}
+              onError={(e) => {
+                console.error("Image failed to load:", e)
+                setIsImageLoaded(true)
+              }}
               decoding="async"
             />
           ) : (
