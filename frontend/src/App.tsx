@@ -39,7 +39,7 @@ function App() {
             grnnamespace: "0",
             prop: "extracts|info|pageimages",
             inprop: "url|varianttitles",
-            grnlimit: "9",
+            grnlimit: "20",
             exintro: "1",
             exlimit: "max",
             exsentences: "5",

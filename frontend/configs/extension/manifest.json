@@ -1,15 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Wikinote",
-  "version": "0.0.2",
+  "version": "1.0.1",
   "description": "Discover random Wikipedia articles on every new tab",
-  "permissions": [
-    "storage",
-    "unlimitedStorage"
-  ],
-  "host_permissions": [
-    "https://*.wikipedia.org/*"
-  ],
+  "permissions": ["storage", "unlimitedStorage"],
+  "host_permissions": ["https://*.wikipedia.org/*"],
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
