@@ -16,7 +16,7 @@ import { fetchWithCORS } from "./utils/environment"
 function App() {
   const [showAbout, setShowAbout] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
-  const { currentLanguage } = useLocalization()
+  const { currentLanguage, ready } = useLocalization()
   const [isScrolled, setIsScrolled] = useState<boolean>(false)
   const { scrollYProgress } = useScroll() // ensure motion scroll values are initialized (not used directly)
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -94,6 +94,7 @@ function App() {
     getNextPageParam: (_lastPage: WikiArticle[], allPages: WikiArticle[][]) => allPages.length,
     retry: 2,
     refetchOnWindowFocus: false,
+    enabled: ready,
   })
 
   const flatArticles = (queryData?.pages ?? []).flat() as WikiArticle[]
